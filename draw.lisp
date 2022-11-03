@@ -26,7 +26,7 @@
     (destructuring-bind (x y) (real-coords x y)
       (let ((x (* side x))
             (y (* side y))
-            (side (* side (ngon-scale n))))
+            (side (- (* side (ngon-scale n)) 2)))
         (ngon n x y side side angle)
         (when (node-inside node)
           (with-pen (make-pen :fill (case (node-inside node)
