@@ -17,5 +17,5 @@
   (:nicknames #:rht/draw)
   (:import-from #:sketch
                 #:defsketch #:translate #:with-pen #:make-pen
-                #:ngon #:circle
+                #:ngon #:circle #:text
                 #:+red+ #:+green+ #:+yellow+ #:+blue+ #:+black+))

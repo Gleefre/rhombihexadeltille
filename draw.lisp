@@ -46,9 +46,16 @@
                               :weight 5)
             (ngon n x y (- side 10) (- side 10) angle)))))))
 
-(defsketch level ((map (level 2)) (width 800) (height 800))
+(defsketch level ((map (level 1))
+                  (width 800)
+                  (height 800))
   (translate 100 100)
   (maphash (lambda (c node) (draw-node (car c) (cadr c) node 50))
-           map))
+           map)
+  (if (win? map) (text "WIN! :)" 0 100)))
+
+(defmethod kit.sdl2:keyboard-event ((app level) st ts but keysym)
+  (when (eq st :keydown)
+    (rotate (slot-value app 'map) (random 2) 0)))
 
 (make-instance 'level)
