@@ -55,10 +55,10 @@
   `(push (list ,coords ,direction) (gethash ,key map nil)))
 
 (defmacro deftrash (coords)
-  `(setf (node-inside (gaethash ,coords map)) :trash))
+  `(setf (node-inside (gethash ,coords map)) :trash))
 
 (defmacro defbin (coords)
-  `(setf (node-outside (gaethash ,coords map)) :bin))
+  `(setf (node-outside (gethash ,coords map)) :bin))
 
 ;; Functions to check if the level was passed
 
