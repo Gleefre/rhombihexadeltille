@@ -51,8 +51,10 @@
   (maphash (lambda (c node) (draw-node (car c) (cadr c) node 50))
            map)
   (translate -300 -300)
+  (with-font (make-font :align :right :size 50)
+      (text "level: 1" 600 0))
   (when (win? map)
-    (with-font (make-font :color (gray .7) :size 50)
+    (with-font (make-font :color (gray .8) :size 50)
       (text "Hurray! :)" 100 100))))
 
 (defmethod kit.sdl2:keyboard-event ((app level) st ts but keysym)
