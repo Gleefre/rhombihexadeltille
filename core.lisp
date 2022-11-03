@@ -47,8 +47,13 @@
 
 ;; Functions to define map
 
-(defmacro with-map (initial-coords &body body)
+(defmacro with-new-map (initial-coords &body body)
   `(let ((map (make-level-map ,initial-coords)))
+     ,@body
+     map))
+
+(defmacro with-map (map-name &body body)
+  `(let ((map ,map-name))
      ,@body
      map))
 
