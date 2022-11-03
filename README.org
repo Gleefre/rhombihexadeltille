@@ -1,0 +1,23 @@
+#+title: Rhombihexadeltille Game
+#+author: Gleefre
+#+email: varedif.a.s@gmail.com
+
+#+description: This is a README and a TODO file for the project of Rhombihexadeltille Game
+#+language: en
+
+* Description
+* Installation
+** Requirements
+* todo list
+  - Game
+    - [ ] Game engine (sketch for drawing?)
+    - [ ] Level design
+    - [ ] Main menu
+    - [ ] Options
+    - [ ] Sound (sdl2-mixer?)
+  - Github repo
+    - [ ] Readme rewrite
+    - [ ] Separate TODO
+    - [ ] Licence
+  - [ ] Publish on icht.io and try to submit it for Lisp Game Jam 2022
+* License
