@@ -65,7 +65,8 @@
 (defun arrived? (node)
   (case (node-inside node)
     ((:red :green :yellow :blue) (eql (node-inside node) (node-outside node)))
-    (:trash nil)))
+    (:trash nil)
+    (t t)))
 
 (defun win? (map)
   (loop for node being the hash-values of map
