@@ -5,7 +5,7 @@
    :map          (with-new-map '((0 0))
                    (deftrip '(1/2 0) '(-1/2 1/2) :red))
    :rotation-map (with-new-map ()
-                   (defrotate :space '(0 0) :clockwise))))
+                   (defrotate :scancode-space '(0 0) :clockwise))))
 
 (defun level-2 ()
   (make-level
@@ -13,8 +13,8 @@
                    (deftrip '(1/2 0) '(1/2 1/2) :red)
                    (deftrip '(-2/3 1/3) '(-2/3 1/3) :yellow))
    :rotation-map (with-new-map ()
-                   (defrotate :a '(0 0) :clockwise)
-                   (defrotate :b '(1 0) :counterclockwise))))
+                   (defrotate :scancode-a '(0 0) :clockwise)
+                   (defrotate :scancode-d '(1 0) :counterclockwise))))
 
 (defun level (n)
   (case n

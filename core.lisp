@@ -67,7 +67,8 @@
 ;; Macro to build rotation map
 
 (defmacro defrotate (key coords direction)
-  `(push (list ,coords ,direction) (gethash ,key map nil)))
+  `(progn (push (list ,coords ,direction) (gethash ,key map nil))
+          (pushnew ,key (gethash :rotations map nil))))
 
 ;; Level consists of map, rotation map, number of steps done, steps restriction and win/lose/play state
 
@@ -107,7 +108,9 @@
 
 (defun level-step (level rotation-key)
   (with-slots (state steps max-steps) level
-    (when (eql state :play) ; step further only if it is playable
+    (when (and (eql state :play) ; step further only if it is playable
+               (member rotation-key
+                       (gethash :rotations (level-rotation-map level))))
       (incf steps)
       (key-rotate level rotation-key)
       (throw-to-bins level)

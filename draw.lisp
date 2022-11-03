@@ -46,19 +46,25 @@
                               :weight 5)
             (ngon n x y (- side 10) (- side 10) angle)))))))
 
-(defsketch level ((map (level 1)))
+(defsketch draw-level ((level (level 1)))
   (translate 300 300)
   (maphash (lambda (c node) (draw-node (car c) (cadr c) node 50))
-           map)
+           (level-map level))
   (translate -300 -300)
   (with-font (make-font :align :right :size 50)
       (text "level: 1" 600 0))
-  (when (win? map)
+  (when (eql (level-state level) :won)
     (with-font (make-font :color (gray .8) :size 50)
       (text "Hurray! :)" 100 100))))
 
-(defmethod kit.sdl2:keyboard-event ((app level) st ts but keysym)
-  (when (eq st :keydown)
-    (rotate (slot-value app 'map) 0 0)))
+(defmethod kit.sdl2:keyboard-event ((app draw-level) state ts repeat? keysym
+                                    &aux (key (sdl2:scancode keysym)))
+  (when (and (eq state :keydown) (not repeat?))
+    (with-slots (level) app
+      (case key
+        ((:scancode-space :scancode-a :scancode-d)
+         (level-step level key))
+        (:scancode-1 (setf level (level 1)))
+        (:scancode-2 (setf level (level 2)))))))
 
-(make-instance 'level :width 600 :height 600)
+(make-instance 'draw-level :width 600 :height 600)
