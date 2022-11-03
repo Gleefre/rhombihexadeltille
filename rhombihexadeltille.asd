@@ -1,6 +1,6 @@
 (defsystem "rhombihexadeltille"
   :description "A little puzzle game"
-  :version "0.0.0"
+  :version "0.0.1"
   :author "Gleefre <varedif.a.s@gmail.com>"
   :depends-on ("sketch")
   :components ((:file "packages")
