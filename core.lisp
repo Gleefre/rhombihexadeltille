@@ -31,7 +31,7 @@
   `(rotatef ,@(loop for i from start below length by k
                     collect `(node-inside (nth ,i ,list-name)))))
 
-(defun rotate (map x y)
+(defun hexagon-rotate (map x y)
   (let ((nodes (loop for c in (neighbours x y)
                      collect (gethash c map))))
     (rotate-insides nodes 12 0 2)
@@ -40,7 +40,7 @@
 (defun key-rotate (map key)
   (loop for ((x y) direction) in (gethash key map)
         if (eql direction :clockwise)
-        do (rotate map x y)
+        do (hexagon-rotate map x y)
         if (eql direction :counterclockwise)
         do (loop repeat 3
                  do (rotate map x y))))
