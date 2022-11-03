@@ -56,6 +56,6 @@
 
 (defmethod kit.sdl2:keyboard-event ((app level) st ts but keysym)
   (when (eq st :keydown)
-    (rotate (slot-value app 'map) (random 2) 0)))
+    (rotate (slot-value app 'map) 0 0)))
 
 (make-instance 'level)
