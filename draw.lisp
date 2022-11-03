@@ -46,11 +46,27 @@
                               :weight 5)
             (ngon n x y (- side 10) (- side 10) angle)))))))
 
+(defun draw-rotation (key config &aux (key (case key
+                                             (:scancode-s "S")
+                                             (:scancode-a "A")
+                                             (:scancode-d "D")
+                                             (:scancode-w "W"))))
+  (loop for ((hx hy) dir) in config
+        for (x y) = (real-coords hx hy)
+        do (with-font (make-font :size 40 :color (case dir
+                                                   (:clockwise +blue+)
+                                                   (:counterclockwise +blue+))
+                                 :align :center)
+             (text key (* 50 x) (- (* 50 y) 20)))))
+
 (defsketch draw-level ((level-number 1)
                        (level (level 1)))
   (translate 300 300)
   (maphash (lambda (c node) (draw-node (car c) (cadr c) node 50))
            (level-map level))
+  (mapcar (lambda (key &aux (coords (gethash key (level-rotation-map level))))
+            (draw-rotation key coords))
+          (gethash :rotations (level-rotation-map level)))
   (translate -300 -300)
   (with-font (make-font :align :left :size 50)
     (text (format nil "level: ~a" level-number) 300 0)
