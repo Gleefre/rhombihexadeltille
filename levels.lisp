@@ -5,7 +5,7 @@
    :map          (with-new-map '((0 0))
                    (deftrip '(1/2 0) '(-1/2 1/2) :red))
    :rotation-map (with-new-map ()
-                   (defrotate :scancode-space '(0 0) :clockwise))))
+                   (defrotate :scancode-s '(0 0) :clockwise))))
 
 (defun level-2 ()
   (make-level
@@ -13,10 +13,22 @@
                    (deftrip '(1/2 0) '(1/2 1/2) :red)
                    (deftrip '(-2/3 1/3) '(-2/3 1/3) :yellow))
    :rotation-map (with-new-map ()
-                   (defrotate :scancode-a '(0 0) :clockwise)
-                   (defrotate :scancode-d '(1 0) :counterclockwise))))
+                   (defrotate :scancode-a '(0 0) :counterclockwise)
+                   (defrotate :scancode-d '(1 0) :clockwise))
+   :max-steps 10))
+
+(defun level-3 ()
+  (make-level
+   :map          (with-new-map '((0 0) (1 0))
+                   (defbin '(1/2 0))
+                   (deftrash '(0 -1/2))
+                   (deftrip '(1 -1/2) '(1/2 1/2) :blue))
+   :rotation-map (with-new-map ()
+                   (defrotate :scancode-s '(0 0) :counterclockwise)
+                   (defrotate :scancode-w '(1 0) :clockwise))))
 
 (defun level (n)
   (case n
     (1 (level-1))
-    (2 (level-2))))
+    (2 (level-2))
+    (3 (level-3))))

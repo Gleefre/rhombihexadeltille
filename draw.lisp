@@ -67,11 +67,15 @@
 (defmethod kit.sdl2:keyboard-event ((app draw-level) state ts repeat? keysym
                                     &aux (key (sdl2:scancode keysym)))
   (when (and (eq state :keydown) (not repeat?))
-    (with-slots (level) app
+    (with-slots (level level-number) app
       (case key
-        ((:scancode-space :scancode-a :scancode-d)
+        ((:scancode-s :scancode-a :scancode-d :scancode-w)
          (level-step level key))
-        (:scancode-1 (setf level (level 1)))
-        (:scancode-2 (setf level (level 2)))))))
+        (:scancode-1 (setf level (level 1)
+                           level-number 1))
+        (:scancode-2 (setf level (level 2)
+                           level-number 2))
+        (:scancode-3 (setf level (level 3)
+                           level-number 3))))))
 
 (make-instance 'draw-level :width 600 :height 600)
