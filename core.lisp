@@ -14,13 +14,17 @@
     (loop for (dx dy) in shifts
           collect (list (+ x dx) (+ y dy)))))
 
+(defun add-hexagon (map hx hy)
+  (unless (gethash (list hx hy) map)
+    (setf (gethash (list hx hy) map) (make-node))
+    (loop for coords in (neighbours hx hy)
+          unless (gethash coords map)
+          do (setf (gethash coords map) (make-node)))))
+
 (defun make-level-map (hexagons)
   (let ((level-map (make-hash-table :test 'equal)))
     (loop for (hx hy) in hexagons
-          do (setf (gethash (list hx hy) level-map) (make-node))
-          do (loop for coords in (neighbours hx hy)
-                   unless (gethash coords level-map)
-                   do (setf (gethash coords level-map) (make-node))))
+          do (add-hexagon level-map hx hy))
     level-map))
 
 (defmacro rotate-insides (list-name length start k)

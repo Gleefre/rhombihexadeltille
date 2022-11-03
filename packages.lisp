@@ -1,7 +1,7 @@
 (defpackage #:rhombihexadeltille/core
   (:use #:cl)
   (:export #:node #:node-inside #:node-outside
-           #:make-level-map
+           #:make-level-map #:add-hexagon
            #:rotate #:key-rotate
            #:with-map #:deftrip #:defrotate #:deftrash #:defbin
            #:win?)
