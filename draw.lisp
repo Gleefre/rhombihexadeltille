@@ -46,7 +46,8 @@
                               :weight 5)
             (ngon n x y (- side 10) (- side 10) angle)))))))
 
-(defsketch draw-level ((level (level 1)))
+(defsketch draw-level ((level-number 1)
+                       (level (level 1)))
   (translate 300 300)
   (maphash (lambda (c node) (draw-node (car c) (cadr c) node 50))
            (level-map level))
