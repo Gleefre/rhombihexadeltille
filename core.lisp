@@ -70,6 +70,9 @@
 (defmacro defbin (coords)
   `(setf (node-outside (gethash ,coords map)) :bin))
 
+(defmacro defhex (coords)
+  `(apply #'add-hexagon map ,coords))
+
 ;; Functions to check if the level was passed
 
 (defun arrived? (node)
