@@ -47,10 +47,13 @@
             (ngon n x y (- side 10) (- side 10) angle)))))))
 
 (defsketch level ((map (level 1)))
-  (translate 100 100)
+  (translate 300 300)
   (maphash (lambda (c node) (draw-node (car c) (cadr c) node 50))
            map)
-  (if (win? map) (text "WIN! :)" 0 100)))
+  (translate -300 -300)
+  (when (win? map)
+    (with-font (make-font :color (gray .7) :size 50)
+      (text "Hurray! :)" 100 100))))
 
 (defmethod kit.sdl2:keyboard-event ((app level) st ts but keysym)
   (when (eq st :keydown)

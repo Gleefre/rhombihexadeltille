@@ -16,6 +16,6 @@
   (:use #:cl #:rht/core #:rht/levels)
   (:nicknames #:rht/draw)
   (:import-from #:sketch
-                #:defsketch #:translate #:with-pen #:make-pen
+                #:defsketch #:translate #:with-pen #:make-pen #:with-font #:make-font
                 #:ngon #:circle #:text
-                #:+red+ #:+green+ #:+yellow+ #:+blue+ #:+black+))
+                #:+red+ #:+green+ #:+yellow+ #:+blue+ #:+black+ #:gray))
