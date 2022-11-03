@@ -46,9 +46,7 @@
                               :weight 5)
             (ngon n x y (- side 10) (- side 10) angle)))))))
 
-(defsketch level ((map (level 1))
-                  (width 800)
-                  (height 800))
+(defsketch level ((map (level 1)))
   (translate 100 100)
   (maphash (lambda (c node) (draw-node (car c) (cadr c) node 50))
            map)
@@ -58,4 +56,4 @@
   (when (eq st :keydown)
     (rotate (slot-value app 'map) 0 0)))
 
-(make-instance 'level)
+(make-instance 'level :width 600 :height 600)
