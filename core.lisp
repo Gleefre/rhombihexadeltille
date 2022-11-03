@@ -1,6 +1,7 @@
 (in-package #:rht/core)
 
 ;; Node is a single ngon
+;; It can contain a mover inside and a goal outside
 
 (defstruct node
   outside inside)
