@@ -1,10 +1,18 @@
 (defpackage #:rhombihexadeltille/core
   (:use #:cl)
   (:export #:node #:node-inside #:node-outside
+           #:level #:make-level
+           #:level-map #:level-rotation-map
+           #:level-steps #:level-max-steps #:level-state
+
            #:make-level-map #:add-hexagon
-           #:rotate #:key-rotate
-           #:with-map #:deftrip #:defrotate #:deftrash #:defbin
-           #:win?)
+           #:hexagon-rotate #:key-rotate
+
+           #:with-map #:with-new-map
+           #:deftrip #:deftrash #:defbin #:defhex
+           #:defrotate
+
+           #:level-step)
   (:nicknames #:rht/core))
 
 (defpackage #:rhombihexadeltille/levels

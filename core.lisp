@@ -37,15 +37,7 @@
     (rotate-insides nodes 12 0 2)
     (rotate-insides nodes 12 1 2)))
 
-(defun key-rotate (map key)
-  (loop for ((x y) direction) in (gethash key map)
-        if (eql direction :clockwise)
-        do (hexagon-rotate map x y)
-        if (eql direction :counterclockwise)
-        do (loop repeat 3
-                 do (rotate map x y))))
-
-;; Functions to define map
+;; Macros to define map (works both for map and rotation-map
 
 (defmacro with-new-map (initial-coords &body body)
   `(let ((map (make-level-map ,initial-coords)))
@@ -57,12 +49,11 @@
      ,@body
      map))
 
+;; Macros to build map
+
 (defmacro deftrip (depart arrive color)
   `(setf (node-inside  (gethash ,depart map)) ,color
          (node-outside (gethash ,arrive map)) ,color))
-
-(defmacro defrotate (key coords direction)
-  `(push (list ,coords ,direction) (gethash ,key map nil)))
 
 (defmacro deftrash (coords)
   `(setf (node-inside (gethash ,coords map)) :trash))
@@ -73,6 +64,56 @@
 (defmacro defhex (coords)
   `(apply #'add-hexagon map ,coords))
 
+;; Macro to build rotation map
+
+(defmacro defrotate (key coords direction)
+  `(push (list ,coords ,direction) (gethash ,key map nil)))
+
+;; Level consists of map, rotation map, number of steps done, steps restriction and win/lose/play state
+
+(defstruct level
+  map rotation-map
+  (steps 0)
+  (max-steps 0) ; 0 means no restriction
+  (state :play)) ; :won / :lost / :play
+
+;; Make a rotation by its name
+
+(defun key-rotate (level key)
+  (with-slots (map rotation-map) level
+    (loop for ((x y) direction) in (gethash key rotation-map)
+          if (eql direction :clockwise)
+          do (hexagon-rotate map x y)
+          if (eql direction :counterclockwise)
+          do (loop repeat 5
+                   do (rotate map x y)))))
+
+;; Throw all to the bins
+;; You lost if a mover is thrown to the bin
+
+(defun throw-to-bins (level)
+  (maphash (lambda (_ node)
+             (declare (ignore _))
+             (when (eql (node-outside node) :bin)
+               (when (node-inside node)
+                 (case (node-inside node)
+                   (:trash (setf (node-inside node) nil))
+                   (t (setf (level-state level) :lost))))))
+           (level-map level)))
+
+;; Making a step
+;; We need to (1) count a step, then (2) make a rotation,
+;; then to (3) throw trash to the bins, then (4) update win/lose state
+
+(defun level-step (level rotation-key)
+  (with-slots (state steps max-steps) level
+    (when (eql state :play) ; step further only if it is playable
+      (incf steps)
+      (key-rotate level rotation-key)
+      (throw-to-bins level)
+      (cond ((win? level) (setf state :won))
+            ((= steps max-steps) (setf state :lost))))))
+
 ;; Functions to check if the level was passed
 
 (defun arrived? (node)
@@ -81,6 +122,12 @@
     (:trash nil)
     (t t)))
 
-(defun win? (map)
+(defun all-arrived? (map)
   (loop for node being the hash-values of map
         always (arrived? node)))
+
+(defun win? (level)
+  (with-slots (map steps max-steps) level
+    (and (all-arrived? map)
+         (or (zerop max-steps)
+             (<= steps max-steps)))))
