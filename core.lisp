@@ -86,7 +86,7 @@
           do (hexagon-rotate map x y)
           if (eql direction :counterclockwise)
           do (loop repeat 5
-                   do (rotate map x y)))))
+                   do (hexagon-rotate map x y)))))
 
 ;; Throw all to the bins
 ;; You lost if a mover is thrown to the bin
