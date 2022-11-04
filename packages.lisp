@@ -23,7 +23,7 @@
   (:nicknames #:rht/core))
 
 (defpackage #:rhombihexadeltille/levels
-  (:use #:cl #:rht/core)
+  (:use #:cl #:rht/core #:rht/geometry)
   (:export #:level)
   (:nicknames #:rht/levels))
 
@@ -35,4 +35,5 @@
 
 (defpackage #:rhombihexadeltille
   (:use #:cl #:rht/draw)
-  (:export #:start))
+  (:export #:start)
+  (:nicknames #:rht))

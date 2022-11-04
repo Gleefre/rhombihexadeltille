@@ -65,10 +65,11 @@
     (t coord)))
 
 (defun parse-coords (coords)
-  (if (single-coord? coords)
-      (list (parse-coord coords))
-      (loop for c in coords
-            collect (parse-coord c))))
+  (cond
+    ((not (listp coords)) coords)
+    ((single-coord? coords) `(list ,(parse-coord coords)))
+    (t `(list ,@(loop for c in coords
+                      collect (parse-coord c))))))
 
 ;; Macros to define level
 
@@ -85,36 +86,37 @@
      level))
 
 (defmacro defl/hex (coords)
-  `(progn ,@(loop for c in (parse-coords coords)
-                  collect `(apply #'add-hexagon hexagon-map ,c))))
+  `(loop for c in ,(parse-coords coords)
+         do (apply #'add-hexagon hexagon-map c)))
 
 (defmacro defl/trip (color depart arrive)
   `(let ((color ,color))
-     (setf ,@(loop for c in (parse-coords depart)
-                   collect `(node-inside (gethash ,c hexagon-map))
-                   collect 'color)
-           ,@(loop for c in (parse-coords arrive)
-                   collect `(node-outside (gethash ,c hexagon-map))
-                   collect '(list :color color)))))
+     (loop for c in ,(parse-coords depart)
+           do (setf (node-inside (gethash c hexagon-map))
+                    color))
+     (loop for c in ,(parse-coords arrive)
+           do (setf (node-outside (gethash c hexagon-map))
+                    (list :color color)))))
 
 (defmacro defl/trash (coords)
-  `(setf ,@(loop for c in (parse-coords coords)
-                 collect `(node-inside (gethash ,c hexagon-map))
-                 collect :trash)))
+  `(loop for c in ,(parse-coords coords)
+         do (setf (node-inside (gethash c hexagon-map))
+                  :trash)))
 
 (defmacro defl/bin (coords safe?)
   `(let ((safe ,safe?))
-     (setf ,@(loop for c in (parse-coords coords)
-                   collect `(node-outside (gethash ,c hexagon-map))
-                   collect '(list :bin safe)))))
+     (loop for c in ,(parse-coords coords)
+           do (setf (node-outside (gethash c hexagon-map))
+                    (list :bin safe)))))
 
 (defmacro defl/rotate (key direction coords)
   `(let ((key ,key)
          (direction ,direction))
-     ,@(loop for c in (parse-coords coords)
-             collect `(setf (node-outside (gethash ,c hexagon-map))
-                            (list :rotation key direction))
-             collect `(push (list ,c direction) (gethash key rotation-map nil)))))
+     (loop for c in ,(parse-coords coords)
+           do (setf (node-outside (gethash c hexagon-map))
+                    (list :rotation key direction))
+           do (push (list c direction)
+                    (gethash key rotation-map nil)))))
 
 (defmacro defl/maxsteps (n)
   `(setf max-steps ,n))
