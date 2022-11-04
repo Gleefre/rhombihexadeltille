@@ -26,8 +26,8 @@
 
 (defun integer-neighbours (x y)
   (loop for dir in +all-directions+
-        for coords = (c-hex dir x y)
-        when (zerop (+ (mod hx 1) (mod hy 1)))
+        for coords = (hex-> dir x y)
+        when (zerop (+ (mod (car coords) 1) (mod (cadr coords) 1)))
         collect coords))
 
 ;; We want to transform coordinates to/from our base to usual base
