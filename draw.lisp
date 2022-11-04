@@ -128,4 +128,5 @@
          (setf animate? (cdr (assoc key *key-map*)))
          (setf animate-start (get-internal-real-time)))))))
 
-(make-instance 'draw-level :width 600 :height 600)
+(defun start ()
+  (make-instance 'draw-level :width 600 :height 600))
