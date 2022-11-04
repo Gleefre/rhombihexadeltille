@@ -17,7 +17,7 @@
   '((:scancode-a . :a) (:scancode-s . :s)
     (:scancode-d . :d) (:scancode-w . :w)))
 (defparameter *level-map*
-  '((:scancode-1 . 1) (:scancode-2 . 2) (:scancode-3 . 3)))
+  '((:scancode-1 . 1) (:scancode-2 . 2) (:scancode-3 . 3) (:scancode-4 . 4)))
 
 (defun node-shape (x y &aux (dx (mod x 1)) (dy (mod y 1)))
   (case (+ dx (* 3 dy))
