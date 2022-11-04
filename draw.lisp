@@ -1,5 +1,22 @@
 (in-package #:rht/draw)
 
+(defparameter *side* 50)
+(defparameter *d-side* 5) ; how much space to leave between nodes
+(defparameter *mover-r* 5) ; how big do we draw the mover
+(defparameter *outside-weight* 5) ;how thick is border of node with goal
+(defparameter *font-size* 40) ; for rotation letters
+(defparameter *font-shift* 20) ; shift by y-axis to center rotate letter in the node
+
+(defparameter *color-map*
+  (list (cons :red   +red+  ) (cons :yellow +yellow+)
+        (cons :green +green+) (cons :blue   +blue+  )
+        (cons :trash +black+)))
+(defparameter *key-map*
+  '((:scancode-a . :a) (:scancode-s . :s)
+    (:scancode-d . :d) (:scancode-w . :w)))
+(defparameter *level-map*
+  '((:scancode-1 . 1) (:scancode-2 . 2) (:scancode-3 . 3)))
+
 (defun node-shape (x y &aux (dx (mod x 1)) (dy (mod y 1)))
   (case (+ dx (* 3 dy))
     (  0 '(6  90))
@@ -15,52 +32,37 @@
     (3 (sqrt 1/3))
     (6          1)))
 
-(defun draw-node (x y node side)
-  (destructuring-bind (n angle) (node-shape x y)
-    (destructuring-bind (x y) (hex-to-xy x y)
-      (let ((x (* side x))
-            (y (* side y))
-            (side (- (* side (ngon-scale n)) 2)))
-        (ngon n x y side side angle)
-        (when (node-inside node)
-          (with-pen (make-pen :fill (case (node-inside node)
-                                      (:red +red+)
-                                      (:yellow +yellow+)
-                                      (:green +green+)
-                                      (:blue +blue+)
-                                      (:trash +black+)))
-            (circle x y 5)))
-        (when (node-outside node)
-          (with-pen (make-pen :stroke (case (node-outside node)
-                                        (:red +red+)
-                                        (:yellow +yellow+)
-                                        (:green +green+)
-                                        (:blue +blue+)
-                                        (:bin +black+))
-                              :weight 5)
-            (ngon n x y (- side 10) (- side 10) angle)))))))
-
-(defun draw-rotation (key config &aux (key (case key
-                                             (:scancode-s "S")
-                                             (:scancode-a "A")
-                                             (:scancode-d "D")
-                                             (:scancode-w "W"))))
-  (loop for ((hx hy) dir) in config
-        for (x y) = (hex-to-xy hx hy)
-        do (with-font (make-font :size 40 :color (case dir
-                                                   (:clockwise +blue+)
-                                                   (:counterclockwise +blue+))
-                                 :align :center)
-             (text key (* 50 x) (- (* 50 y) 20)))))
+(defun draw-node (x y node)
+  (destructuring-bind ((n angle) (x y))
+      (list (node-shape x y) (hex-to-xy x y))
+    (let ((x (* *side* x))
+          (y (* *side* y))
+          (side (* (- *side* *d-side*) (ngon-scale n)))
+          (sub-side (- (* (- *side* *d-side*) (ngon-scale n))
+                       (* 2 *outside-weight*))))
+      (ngon n x y side side angle)
+      (when (node-inside node)
+        (with-pen (make-pen :fill (cdr (assoc (node-inside node) *color-map*)))
+          (circle x y *mover-r*)))
+      (case (car (node-outside node))
+        (:color  (with-pen (make-pen :stroke (cdr (assoc (second (node-outside node)) *color-map*))
+                                     :weight *outside-weight*)
+                   (ngon n x y sub-side sub-side angle)))
+        (:bin    (with-pen (make-pen :stroke (gray (if (cadr (node-outside node)) 0.5 0))
+                                     :weight *outside-weight*)
+                   (ngon n x y sub-side sub-side angle)))
+        (:rotation (with-font (make-font :size *font-size* :color (case (third (node-outside node))
+                                                                    (:clock +blue+)
+                                                                    (:counter-clock +red+))
+                                         :align :center)
+                     (text (format nil "~a" (second (node-outside node)))
+                           x (- y *font-shift*))))))))
 
 (defsketch draw-level ((level-number 1)
                        (level (level 1)))
   (translate 300 300)
-  (maphash (lambda (c node) (draw-node (car c) (cadr c) node 50))
-           (level-map level))
-  (mapcar (lambda (key &aux (coords (gethash key (level-rotation-map level))))
-            (draw-rotation key coords))
-          (gethash :rotations (level-rotation-map level)))
+  (maphash (lambda (c node) (draw-node (car c) (cadr c) node))
+           (level-hexagon-map level))
   (translate -300 -300)
   (with-font (make-font :align :left :size 50)
     (text (format nil "level: ~a" level-number) 300 0)
@@ -78,14 +80,10 @@
                                     &aux (key (sdl2:scancode keysym)))
   (when (and (eq state :keydown) (not repeat?))
     (with-slots (level level-number) app
-      (case key
-        ((:scancode-s :scancode-a :scancode-d :scancode-w)
-         (level-step level key))
-        (:scancode-1 (setf level (level 1)
-                           level-number 1))
-        (:scancode-2 (setf level (level 2)
-                           level-number 2))
-        (:scancode-3 (setf level (level 3)
-                           level-number 3))))))
+      (cond
+        ((eql key :scancode-r) (setf level (level level-number)))
+        ((assoc key *key-map*) (level-step level (cdr (assoc key *key-map*))))
+        ((assoc key *level-map*) (setf level-number (cdr (assoc key *level-map*))
+                                       level (level level-number)))))))
 
 (make-instance 'draw-level :width 600 :height 600)
