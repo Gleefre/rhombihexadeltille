@@ -15,6 +15,7 @@
     - [ ] Main menu
     - [ ] Options
     - [ ] Sound (sdl2-mixer?)
+    - [ ] Deployment
   - Github repo
     - [ ] Readme rewrite
     - [ ] Separate TODO
