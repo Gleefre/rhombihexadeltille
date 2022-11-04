@@ -7,17 +7,17 @@
 
 (defpackage #:rhombihexadeltille/core
   (:use #:cl #:rht/geometry)
-  (:export #:node #:node-inside #:node-outside #:make-node
-           #:make-level-map #:add-hexagon
-           #:hexagon-rotate #:key-rotate
+  (:export #:node #:make-node #:node-inside #:node-outside
+           #:add-hexagon #:hexagon-rotate #:key-rotate
 
            #:level #:make-level
-           #:level-map #:level-rotation-map
+           #:level-hexagon-map #:level-rotation-map
            #:level-steps #:level-max-steps #:level-state
 
-           #:with-map #:with-new-map
-           #:deftrip #:deftrash #:defbin #:defhex
-           #:defrotate
+           #:with-level #:with-new-level
+           #:defl/hex #:defl/trip #:defl/trash
+           #:defl/bin #:defl/rotate
+           #:defl/maxsteps
 
            #:level-step)
   (:nicknames #:rht/core))

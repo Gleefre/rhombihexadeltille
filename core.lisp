@@ -5,14 +5,14 @@
 
 ;; A mover is one of nil, :trash or keyword for color
 ;; Possible colors: (:red :yellow :green :blue)
-;; To add colors you need to add it to *color-map* variable in rht/draw package
+;; To add colors you need to add it to *color-map* variable in rht/draw package (alist)
 
-;; A goal is one of colors
-;; An actor is one of (:bin safe?) or (:rotate key direction)
+;; A goal if (:color color) where color is one of possible colors.
+;; An actor is one of (:bin safe?) or (:rotation key direction)
 ;; safe? is NIL or T, depending on is it safe for movers to stay there
 ;; direction is one of :clock or :counter-clock
 ;; Possible keys: (:a :s :w :d)
-;; To add keys you need to add it to *key-map* variable in rht/draw package
+;; To add keys you need to add it to *key-map* variable in rht/draw package (alist)
 
 (defstruct node
   outside inside)
@@ -24,12 +24,6 @@
         for point = (hex-> dir hx hy)
         do (setf (gethash point map)
                  (gethash point map (make-node)))))
-
-(defun make-level-map (hexagons)
-  (let ((level-map (make-hash-table :test 'equal)))
-    (loop for (hx hy) in hexagons
-          do (add-hexagon level-map hx hy))
-    level-map))
 
 (defmacro rotate-insides (list-name length start k)
   `(rotatef ,@(loop for i = start then (+ i k)
@@ -47,53 +41,90 @@
         (progn (rotate-insides squares   6 0  1)
                (rotate-insides triangles 6 0  1)))))
 
-;; Macros to define map (works both for map and rotation-map
-
-(defmacro with-new-map (initial-coords &body body)
-  `(let ((map (make-level-map ,initial-coords)))
-     ,@body
-     map))
-
-(defmacro with-map (map-name &body body)
-  `(let ((map ,map-name))
-     ,@body
-     map))
-
-;; Macros to build map
-
-(defmacro deftrip (depart arrive color)
-  `(setf (node-inside  (gethash ,depart map)) ,color
-         (node-outside (gethash ,arrive map)) ,color))
-
-(defmacro deftrash (coords)
-  `(setf (node-inside (gethash ,coords map)) :trash))
-
-(defmacro defbin (coords)
-  `(setf (node-outside (gethash ,coords map)) :bin))
-
-(defmacro defhex (coords)
-  `(apply #'add-hexagon map ,coords))
-
-;; Macro to build rotation map
-
-(defmacro defrotate (key coords direction)
-  `(progn (push (list ,coords ,direction) (gethash ,key map nil))
-          (pushnew ,key (gethash :rotations map nil))))
-
 ;; Level consists of map, rotation map, number of steps done, steps restriction and win/lose/play state
 
 (defstruct level
-  map rotation-map
+  (hexagon-map (make-hash-table :test 'equal))
+  (rotation-map (make-hash-table))
   (steps 0)
   (max-steps 0) ; 0 means no restriction
   (state :play)) ; :won / :lost / :play
 
-;; Make a rotation by its name
+;; Helpers for parsing coordinates passed to defl/ macros
+
+(defun single-coord? (coords)
+  (or (not (listp coords))
+      (numberp (first coords))
+      (keywordp (first coords))))
+
+(defun parse-coord (coord)
+  (cond
+    ((not (listp coord)) coord)
+    ((numberp (first coord)) `(list ,@coord))
+    ((keywordp (first coord)) `(hex-> ,@coord))
+    (t coord)))
+
+(defun parse-coords (coords)
+  (if (single-coord? coords)
+      (list (parse-coord coords))
+      (loop for c in coords
+            collect (parse-coord c))))
+
+;; Macros to define level
+
+(defmacro with-new-level (&body body)
+  `(let ((level (make-level)))
+     (with-slots (hexagon-map rotation-map max-steps) level
+       ,@body)
+     level))
+
+(defmacro with-level (level-form &body body)
+  `(let ((level ,level-form))
+     (with-slots (hexagon-map rotation-map max-steps) level
+       ,@body)
+     level))
+
+(defmacro defl/hex (coords)
+  `(progn ,@(loop for c in (parse-coords coords)
+                  collect `(apply #'add-hexagon hexagon-map ,c))))
+
+(defmacro defl/trip (color depart arrive)
+  `(let ((color ,color))
+     (setf ,@(loop for c in (parse-coords depart)
+                   collect `(node-inside (gethash ,c hexagon-map))
+                   collect 'color)
+           ,@(loop for c in (parse-coords arrive)
+                   collect `(node-outside (gethash ,c hexagon-map))
+                   collect '(list :color color)))))
+
+(defmacro defl/trash (coords)
+  `(setf ,@(loop for c in (parse-coords coords)
+                 collect `(node-inside (gethash ,c hexagon-map))
+                 collect :trash)))
+
+(defmacro defl/bin (coords safe?)
+  `(let ((safe ,safe?))
+     (setf ,@(loop for c in (parse-coords coords)
+                   collect `(node-outside (gethash ,c hexagon-map))
+                   collect '(list :bin safe)))))
+
+(defmacro defl/rotate (key direction coords)
+  `(let ((key ,key)
+         (direction ,direction))
+     ,@(loop for c in (parse-coords coords)
+             collect `(setf (node-outside (gethash ,c hexagon-map))
+                            (list :rotation key direction))
+             collect `(push (list ,c direction) (gethash key rotation-map nil)))))
+
+(defmacro defl/maxsteps (n)
+  `(setf max-steps ,n))
+
+;; Perform a rotation by its name
 
 (defun key-rotate (level key)
-  (with-slots (map rotation-map) level
+  (with-slots (hexagon-map rotation-map) level
     (loop for ((x y) direction) in (gethash key rotation-map)
-          do (hexagon-rotate map x y direction))))
+          do (hexagon-rotate hexagon-map x y direction))))
 
 ;; Throw all to the bins
 ;; You lost if a mover is thrown to the bin
@@ -101,22 +132,21 @@
 (defun throw-to-bins (level)
   (maphash (lambda (_ node)
              (declare (ignore _))
-             (when (eql (node-outside node) :bin)
-               (when (node-inside node)
-                 (case (node-inside node)
-                   (:trash (setf (node-inside node) nil))
-                   (t (setf (level-state level) :lost))))))
-           (level-map level)))
+             (when (and (eql (car (node-outside node)) :bin)
+                        (node-inside node))
+               (case (node-inside node)
+                 (:trash (setf (node-inside node) nil))
+                 (t (unless (second (node-outside node)) (setf (level-state level) :lost))))))
+           (level-hexagon-map level)))
 
 ;; Making a step
 ;; We need to (1) count a step, then (2) make a rotation,
 ;; then to (3) throw trash to the bins, then (4) update win/lose state
 
 (defun level-step (level rotation-key)
-  (with-slots (state steps max-steps) level
+  (with-slots (state steps max-steps rotation-map) level
     (when (and (eql state :play) ; step further only if it is playable
-               (member rotation-key
-                       (gethash :rotations (level-rotation-map level))))
+               (gethash rotation-key rotation-map)) ; and if rotation is defined
       (incf steps)
       (key-rotate level rotation-key)
       (throw-to-bins level)
@@ -125,18 +155,17 @@
 
 ;; Functions to check if the level was passed
 
-(defun arrived? (node)
+(defun not-arrived? (node)
   (case (node-inside node)
-    ((:red :green :yellow :blue) (eql (node-inside node) (node-outside node)))
-    (:trash nil)
-    (t t)))
+    ((:red :green :yellow :blue) (not (eql (node-inside node) (cadr (node-outside node)))))
+    (:trash t)))
 
-(defun all-arrived? (map)
-  (loop for node being the hash-values of map
-        always (arrived? node)))
+(defun all-arrived? (hexagon-map)
+  (loop for node being the hash-values of hexagon-map
+        never (not-arrived? node)))
 
 (defun win? (level)
-  (with-slots (map steps max-steps) level
-    (and (all-arrived? map)
+  (with-slots (hexagon-map steps max-steps) level
+    (and (all-arrived? hexagon-map)
          (or (zerop max-steps)
              (<= steps max-steps)))))
