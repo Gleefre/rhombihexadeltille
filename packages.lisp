@@ -1,12 +1,19 @@
-(defpackage #:rhombihexadeltille/core
+(defpackage #:rhombihexadeltille/geometry
   (:use #:cl)
-  (:export #:node #:node-inside #:node-outside
+  (:export #:+all-directions+ #:+directions+ #:+t-directions+ #:+sq-directions+
+           #:hex-> #:integer-neighbours
+           #:hex-to-xy #:xy-to-hex)
+  (:nicknames #:rht/geometry))
+
+(defpackage #:rhombihexadeltille/core
+  (:use #:cl #:rht/geometry)
+  (:export #:node #:node-inside #:node-outside #:make-node
+           #:make-level-map #:add-hexagon
+           #:hexagon-rotate #:key-rotate
+
            #:level #:make-level
            #:level-map #:level-rotation-map
            #:level-steps #:level-max-steps #:level-state
-
-           #:make-level-map #:add-hexagon
-           #:hexagon-rotate #:key-rotate
 
            #:with-map #:with-new-map
            #:deftrip #:deftrash #:defbin #:defhex
@@ -21,9 +28,6 @@
   (:nicknames #:rht/levels))
 
 (defpackage #:rhombihexadeltille/draw
-  (:use #:cl #:rht/core #:rht/levels)
-  (:nicknames #:rht/draw)
-  (:import-from #:sketch
-                #:defsketch #:translate #:with-pen #:make-pen #:with-font #:make-font
-                #:ngon #:circle #:text
-                #:+red+ #:+green+ #:+yellow+ #:+blue+ #:+black+ #:gray))
+  (:use #:cl #:sketch
+        #:rht/core #:rht/levels #:rht/geometry)
+  (:nicknames #:rht/draw))

@@ -1,11 +1,5 @@
 (in-package #:rht/draw)
 
-(defun real-coords (x y)
-  (list (* (+ x (/ y 2))
-           (+ 1 (sqrt 3)))
-        (* (/ y 2)
-           (+ 3 (sqrt 3)))))
-
 (defun node-shape (x y &aux (dx (mod x 1)) (dy (mod y 1)))
   (case (+ dx (* 3 dy))
     (  0 '(6  90))
@@ -23,7 +17,7 @@
 
 (defun draw-node (x y node side)
   (destructuring-bind (n angle) (node-shape x y)
-    (destructuring-bind (x y) (real-coords x y)
+    (destructuring-bind (x y) (hex-to-xy x y)
       (let ((x (* side x))
             (y (* side y))
             (side (- (* side (ngon-scale n)) 2)))
@@ -52,7 +46,7 @@
                                              (:scancode-d "D")
                                              (:scancode-w "W"))))
   (loop for ((hx hy) dir) in config
-        for (x y) = (real-coords hx hy)
+        for (x y) = (hex-to-xy hx hy)
         do (with-font (make-font :size 40 :color (case dir
                                                    (:clockwise +blue+)
                                                    (:counterclockwise +blue+))

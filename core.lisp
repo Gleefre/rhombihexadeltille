@@ -1,25 +1,29 @@
 (in-package #:rht/core)
 
 ;; Node is a single ngon
-;; It can contain a mover inside and a goal outside
+;; It can contain a mover inside and a goal/actor outside
+
+;; A mover is one of nil, :trash or keyword for color
+;; Possible colors: (:red :yellow :green :blue)
+;; To add colors you need to add it to *color-map* variable in rht/draw package
+
+;; A goal is one of colors
+;; An actor is one of (:bin safe?) or (:rotate key direction)
+;; safe? is NIL or T, depending on is it safe for movers to stay there
+;; direction is one of :clock or :counter-clock
+;; Possible keys: (:a :s :w :d)
+;; To add keys you need to add it to *key-map* variable in rht/draw package
 
 (defstruct node
   outside inside)
 
 ;; Functions to manipulate map of nodes
 
-(defun neighbours (x y)
-  (let ((shifts '((0  1/2) ( 1/3  1/3) ( 1/2 0) ( 2/3 -1/3) ( 1/2 -1/2) ( 1/3 -2/3)
-                  (0 -1/2) (-1/3 -1/3) (-1/2 0) (-2/3  1/3) (-1/2  1/2) (-1/3  2/3))))
-    (loop for (dx dy) in shifts
-          collect (list (+ x dx) (+ y dy)))))
-
 (defun add-hexagon (map hx hy)
-  (unless (gethash (list hx hy) map)
-    (setf (gethash (list hx hy) map) (make-node))
-    (loop for coords in (neighbours hx hy)
-          unless (gethash coords map)
-          do (setf (gethash coords map) (make-node)))))
+  (loop for dir in +all-directions+
+        for point = (hex-> dir hx hy)
+        do (setf (gethash point map)
+                 (gethash point map (make-node)))))
 
 (defun make-level-map (hexagons)
   (let ((level-map (make-hash-table :test 'equal)))
@@ -28,14 +32,20 @@
     level-map))
 
 (defmacro rotate-insides (list-name length start k)
-  `(rotatef ,@(loop for i from start below length by k
-                    collect `(node-inside (nth ,i ,list-name)))))
+  `(rotatef ,@(loop for i = start then (+ i k)
+                    repeat (/ length (gcd length (abs k)))
+                    collect `(node-inside (nth ,(mod i length) ,list-name)))))
 
-(defun hexagon-rotate (map x y)
-  (let ((nodes (loop for c in (neighbours x y)
-                     collect (gethash c map))))
-    (rotate-insides nodes 12 0 2)
-    (rotate-insides nodes 12 1 2)))
+(defun hexagon-rotate (map x y direction)
+  (let ((triangles (loop for dir in +t-directions+
+                         collect (gethash (hex-> dir x y) map)))
+        (squares   (loop for dir in +sq-directions+
+                         collect (gethash (hex-> dir x y) map))))
+    (if (eql direction :clock)
+        (progn (rotate-insides squares   6 0 -1)
+               (rotate-insides triangles 6 0 -1))
+        (progn (rotate-insides squares   6 0  1)
+               (rotate-insides triangles 6 0  1)))))
 
 ;; Macros to define map (works both for map and rotation-map
 
@@ -83,11 +93,7 @@
 (defun key-rotate (level key)
   (with-slots (map rotation-map) level
     (loop for ((x y) direction) in (gethash key rotation-map)
-          if (eql direction :clockwise)
-          do (hexagon-rotate map x y)
-          if (eql direction :counterclockwise)
-          do (loop repeat 5
-                   do (hexagon-rotate map x y)))))
+          do (hexagon-rotate map x y direction))))
 
 ;; Throw all to the bins
 ;; You lost if a mover is thrown to the bin

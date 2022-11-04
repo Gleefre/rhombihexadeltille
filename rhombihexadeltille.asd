@@ -4,6 +4,7 @@
   :author "Gleefre <varedif.a.s@gmail.com>"
   :depends-on ("sketch")
   :components ((:file "packages")
+               (:file "geometry")
                (:file "core")
                (:file "levels")
                (:file "draw")))
