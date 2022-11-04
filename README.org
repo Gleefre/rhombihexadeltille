@@ -10,7 +10,7 @@
 ** Requirements
 * todo list
   - Game
-    - [ ] Game engine (sketch for drawing?)
+    - [-] Game engine (sketch for drawing?)
     - [ ] Level design
     - [ ] Main menu
     - [ ] Options
@@ -19,5 +19,5 @@
     - [ ] Readme rewrite
     - [ ] Separate TODO
     - [ ] Licence
-  - [ ] Publish on icht.io and try to submit it for Lisp Game Jam 2022
+  - [ ] Publish on icht.io and submit it for Lisp Game Jam 2022
 * License
