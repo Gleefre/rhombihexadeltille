@@ -2,7 +2,8 @@
   (:use #:cl)
   (:export #:+all-directions+ #:+directions+ #:+t-directions+ #:+sq-directions+
            #:hex-> #:integer-neighbours
-           #:hex-to-xy #:xy-to-hex)
+           #:hex-to-xy #:xy-to-hex
+           #:node-shape #:ngon-scale)
   (:nicknames #:rht/geometry))
 
 (defpackage #:rhombihexadeltille/core
