@@ -66,7 +66,7 @@
   (case n
     (4 (sqrt 1/2))
     (3 (sqrt 1/3))
-    (6          1)))
+    (6       1.075)))
 
 ;; We want to bound hexagon-map to draw it at center and fit the window
 
