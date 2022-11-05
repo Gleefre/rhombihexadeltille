@@ -9,7 +9,7 @@ build:
 		--eval "(quit)"
 	cp NOTICE bin/
 	cp RobotoMono-ExtraLight.ttf bin/
-	rm -r rhombihexadeltille-game/
+	rm -rf rhombihexadeltille-game/
 	mv bin/ rhombihexadeltille-game/
 	zip rhombihexadeltille-game.zip rhombihexadeltille-game/*
-	rm -r rhombihexadeltille-game/
+	rm -rf rhombihexadeltille-game/
