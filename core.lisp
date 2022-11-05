@@ -141,20 +141,6 @@
                  (t (unless (second (node-outside node)) (setf (level-state level) :lost))))))
            (level-hexagon-map level)))
 
-;; Making a step
-;; We need to (1) count a step, then (2) make a rotation,
-;; then to (3) throw trash to the bins, then (4) update win/lose state
-
-(defun level-step (level rotation-key)
-  (with-slots (state steps max-steps rotation-map) level
-    (when (and (eql state :play) ; step further only if it is playable
-               (gethash rotation-key rotation-map)) ; and if rotation is defined
-      (incf steps)
-      (key-rotate level rotation-key)
-      (throw-to-bins level)
-      (cond ((win? level) (setf state :won))
-            ((= steps max-steps) (setf state :lost))))))
-
 ;; Functions to check if the level was passed
 
 (defun not-arrived? (node)
@@ -171,3 +157,17 @@
     (and (all-arrived? hexagon-map)
          (or (zerop max-steps)
              (<= steps max-steps)))))
+
+;; Making a step
+;; We need to (1) count a step, then (2) make a rotation,
+;; then to (3) throw trash to the bins, then (4) update win/lose state
+
+(defun level-step (level rotation-key)
+  (with-slots (state steps max-steps rotation-map) level
+    (when (and (eql state :play) ; step further only if it is playable
+               (gethash rotation-key rotation-map)) ; and if rotation is defined
+      (incf steps)
+      (key-rotate level rotation-key)
+      (throw-to-bins level)
+      (cond ((win? level) (setf state :won))
+            ((= steps max-steps) (setf state :lost))))))
