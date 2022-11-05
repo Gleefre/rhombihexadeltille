@@ -113,12 +113,15 @@
             (:play "Hm... What do I do?")
             (:lost "x-x"))
           100 100)))
-(defun sketch::make-default-font ())
-(defun sketch::make-error-font ())
+#+deploy
+(progn (defun sketch::make-default-font ())
+       (defun sketch::make-error-font ()))
 
 (defmethod setup ((app draw-level) &key &allow-other-keys)
-  (setf *font-face* (load-resource "RobotoMono-ExtraLight.ttf"))
-  (setf *running* t))
+  (setf *font-face* (load-resource (format nil "~a"
+                                           #-deploy (asdf:system-relative-pathname "rhombihexadeltille"
+                                                                                   "RobotoMono-ExtraLight.ttf")
+                                           #+deploy (merge-pathnames (uiop:getcwd) "RobotoMono-ExtraLight.ttf")))))
 
 (defmethod kit.sdl2:close-window :before ((app draw-level))
   (setf *running* nil))
@@ -147,4 +150,3 @@
   (make-instance 'draw-level)
   (loop while *running*
         do (sleep 1)))
-
