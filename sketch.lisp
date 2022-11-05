@@ -10,9 +10,11 @@
 (defparameter *animate-time* 1/2) ; time to animate rotation
 
 (defparameter *color-map*
-  (list (cons :red   +red+  ) (cons :yellow +yellow+)
-        (cons :green +green+) (cons :blue   +blue+  )
-        (cons :trash +black+)))
+  (list (cons :red +red+)
+        (cons :blue +blue+)
+        (cons :trash +black+)
+        (cons :yellow (rgb 0.9 0.7 0))
+        (cons :green (rgb 0 0.7 0))))
 (defparameter *key-map*
   '((:scancode-a . :a) (:scancode-s . :s)
     (:scancode-d . :d) (:scancode-w . :w)))
