@@ -28,9 +28,14 @@
   (:export #:level)
   (:nicknames #:rht/levels))
 
+(defpackage #:rht/utils
+  (:use #:cl)
+  (:export #:do-later #:do-now))
+
 (defpackage #:rhombihexadeltille/sketch
   (:use #:cl #:sketch
-        #:rht/core #:rht/levels #:rht/geometry)
+        #:rht/core #:rht/levels #:rht/geometry
+        #:rht/utils)
   (:export #:start)
   (:nicknames #:rht/sketch))
 
