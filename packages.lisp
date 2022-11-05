@@ -31,9 +31,9 @@
   (:use #:cl #:sketch
         #:rht/core #:rht/levels #:rht/geometry)
   (:export #:start)
-  (:nicknames #:rht/draw))
+  (:nicknames #:rht/sketch))
 
 (defpackage #:rhombihexadeltille
-  (:use #:cl #:rht/draw)
+  (:use #:cl #:rht/sketch)
   (:export #:start)
   (:nicknames #:rht))
