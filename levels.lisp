@@ -42,6 +42,8 @@
     (defl/rotate :w :clock (1 0))
     (defl/rotate :d :clock (0 1))))
 
+(defparameter *levels* 4)
+
 (defun level (n)
   (case n
     (1 (level-1))

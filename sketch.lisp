@@ -128,6 +128,12 @@
       (cond
         (animate?)
         ((eql key :scancode-r) (setf level (level level-number)))
+        ((eql key :scancode-n) (when (< level-number *levels*)
+                                 (incf level-number)
+                                 (setf level (level level-number))))
+        ((eql key :scancode-p) (when (> level-number 1)
+                                 (decf level-number)
+                                 (setf level (level level-number))))
         ((assoc key *level-map*) (setf level-number (cdr (assoc key *level-map*))
                                        level (level level-number)))
         ((not (eql :play (level-state level))))

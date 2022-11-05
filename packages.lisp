@@ -26,7 +26,7 @@
 
 (defpackage #:rhombihexadeltille/levels
   (:use #:cl #:rht/core #:rht/geometry)
-  (:export #:level)
+  (:export #:level #:*levels*)
   (:nicknames #:rht/levels))
 
 (defpackage #:rhombihexadeltille/utils
