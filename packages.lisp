@@ -27,7 +27,7 @@
   (:export #:level)
   (:nicknames #:rht/levels))
 
-(defpackage #:rhombihexadeltille/draw
+(defpackage #:rhombihexadeltille/sketch
   (:use #:cl #:sketch
         #:rht/core #:rht/levels #:rht/geometry)
   (:export #:start)

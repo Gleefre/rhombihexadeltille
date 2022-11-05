@@ -49,3 +49,21 @@
 
 (defun xy-to-hex (&rest coords)
   (matrix-multiply +transform-back+ coords))
+
+;; We want to know shape and radius scale for nodes
+
+(defun node-shape (x y &aux (dx (mod x 1)) (dy (mod y 1)))
+  "Returns a list (n angle) where n is number of vertices and angle is a rotation angle"
+  (case (+ dx (* 3 dy))
+    (  0 '(6  90))
+    (1/2 '(4  45))
+    (3/2 '(4  15))
+    (  2 '(4  75))
+    (4/3 '(3  90))
+    (8/3 '(3 270))))
+
+(defun ngon-scale (n)
+  (case n
+    (4 (sqrt 1/2))
+    (3 (sqrt 1/3))
+    (6          1)))

@@ -1,4 +1,4 @@
-(in-package #:rht/draw)
+(in-package #:rht/sketch)
 
 (defparameter *side* 50)
 (defparameter *d-side* 5) ; how much space to leave between nodes
@@ -18,21 +18,6 @@
     (:scancode-d . :d) (:scancode-w . :w)))
 (defparameter *level-map*
   '((:scancode-1 . 1) (:scancode-2 . 2) (:scancode-3 . 3) (:scancode-4 . 4)))
-
-(defun node-shape (x y &aux (dx (mod x 1)) (dy (mod y 1)))
-  (case (+ dx (* 3 dy))
-    (  0 '(6  90))
-    (1/2 '(4  45))
-    (3/2 '(4  15))
-    (  2 '(4  75))
-    (4/3 '(3  90))
-    (8/3 '(3 270))))
-
-(defun ngon-scale (n)
-  (case n
-    (4 (sqrt 1/2))
-    (3 (sqrt 1/3))
-    (6          1)))
 
 (defun draw-node-outside (hx hy node)
   (destructuring-bind ((n angle) (x y))
