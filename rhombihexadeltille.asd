@@ -7,5 +7,6 @@
   :components ((:file "packages")
                (:file "geometry")
                (:file "core")
+               (:file "utils")
                (:file "levels")
                (:file "sketch"))
