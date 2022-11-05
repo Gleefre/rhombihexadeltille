@@ -21,6 +21,9 @@
 (defparameter *level-map*
   '((:scancode-1 . 1) (:scancode-2 . 2) (:scancode-3 . 3) (:scancode-4 . 4)))
 
+(defvar *font-face*)
+(defparameter *running* t)
+
 (defun draw-node (hx hy node animate? animate-progress hex-map)
   (destructuring-bind ((n angle) (x y))
       (list (node-shape hx hy) (hex-to-xy hx hy))
@@ -52,7 +55,7 @@
            (with-font (make-font :size *font-size* :color (case (third (node-outside node))
                                                             (:clock +blue+)
                                                             (:counter-clock +red+))
-                                 :align :center)
+                                 :align :center :face *font-face*)
              (text (format nil "~a" (second (node-outside node)))
                    x (- y *font-shift*))))))
       (let ((r-angle 0) (r-cx 0)
@@ -97,17 +100,26 @@
       (with-fit ((* *side* w) (* *side* h) 400 400
                  (* *side* x) (* *side* y) 200 200 1)
         (draw-hexagon-map (level-hexagon-map level) animate? animate-progress))))
-  (with-font (make-font :align :left :size 50)
+  (with-font (make-font :align :left :size 50 :face *font-face*)
     (text (format nil "level: ~a" level-number) 300 0)
     (text (format nil "steps: ~a ~{/ ~a~}" (level-steps level)
                   (unless (zerop (level-max-steps level)) (list (level-max-steps level))))
           300 50))
-  (with-font (make-font :color (gray .8) :size 50)
+  (with-font (make-font :color (gray .8) :size 50 :face *font-face*)
     (text (case (level-state level)
             (:won "Hurray! :)")
             (:play "Hm... What do I do?")
             (:lost "x-x"))
           100 100)))
+(defun sketch::make-default-font ())
+(defun sketch::make-error-font ())
+
+(defmethod setup ((app draw-level) &key &allow-other-keys)
+  (setf *font-face* (load-resource "RobotoMono-ExtraLight.ttf"))
+  (setf *running* t))
+
+(defmethod kit.sdl2:close-window :before ((app draw-level))
+  (setf *running* nil))
 
 (defmethod kit.sdl2:keyboard-event ((app draw-level) state ts repeat? keysym
                                     &aux (key (sdl2:scancode keysym)))
@@ -124,4 +136,7 @@
          (setf animate-start (get-internal-real-time)))))))
 
 (defun start ()
-  (make-instance 'draw-level :width 600 :height 600))
+  (make-instance 'draw-level)
+  (loop while *running*
+        do (sleep 1)))
+
