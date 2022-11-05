@@ -3,7 +3,8 @@
   (:export #:+all-directions+ #:+directions+ #:+t-directions+ #:+sq-directions+
            #:hex-> #:integer-neighbours
            #:hex-to-xy #:xy-to-hex
-           #:node-shape #:ngon-scale)
+           #:node-shape #:ngon-scale
+           #:bounds)
   (:nicknames #:rht/geometry))
 
 (defpackage #:rhombihexadeltille/core
@@ -28,14 +29,21 @@
   (:export #:level)
   (:nicknames #:rht/levels))
 
-(defpackage #:rht/utils
+(defpackage #:rhombihexadeltille/utils
   (:use #:cl)
-  (:export #:do-later #:do-now))
+  (:export #:do-later #:do-now)
+  (:nicknames #:rht/utils))
+
+(defpackage #:rhombihexadeltille/sketch/utils
+  (:use #:cl #:sketch)
+  (:export #:fit #:with-fit
+           #:with-translate #:with-rotate #:with-scale)
+  (:nicknames #:rht/sketch/utils))
 
 (defpackage #:rhombihexadeltille/sketch
   (:use #:cl #:sketch
         #:rht/core #:rht/levels #:rht/geometry
-        #:rht/utils)
+        #:rht/utils #:rht/sketch/utils)
   (:export #:start)
   (:nicknames #:rht/sketch))
 

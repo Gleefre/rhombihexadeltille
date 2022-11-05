@@ -67,3 +67,15 @@
     (4 (sqrt 1/2))
     (3 (sqrt 1/3))
     (6          1)))
+
+;; We want to bound hexagon-map to draw it at center and fit the window
+
+(defun bounds (hexagon-map)
+  "Returns x y width height of hexagon map (in real coords)"
+  (loop for (hx hy) being the hash-key of hexagon-map
+        for (x y) = (hex-to-xy hx hy)
+        when (and (integerp hx) (integerp hy))
+        maximize x into max-x and minimize x into min-x and
+        maximize y into max-y and minimize y into min-y
+        finally (return (list (- min-x 2)        (- min-y 2)
+                              (- max-x min-x -4) (- max-y min-y -4)))))
