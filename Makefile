@@ -10,6 +10,7 @@ build:
 		--eval "(quit)"
 	cp NOTICE bin/
 	cp RobotoMono-Bold.ttf bin/
+	cp soundtrack.wav bin/
 	rm -rf rhombihexadeltille-game/
 	mv bin/ rhombihexadeltille-game/
 	zip rhombihexadeltille-game.zip rhombihexadeltille-game/*

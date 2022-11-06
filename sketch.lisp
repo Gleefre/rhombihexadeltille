@@ -41,6 +41,9 @@
 (defparameter *running* t)
 (defparameter *centered* nil)
 
+(defparameter *sound* nil)
+(defparameter *sound-filename* "soundtrack.wav")
+
 (defun draw--> (direction side)
   (with-current-matrix
     (unless (eql direction :clock)
@@ -203,7 +206,10 @@
     (:level+ (incf (menu-level menu)))
     (:level- (decf (menu-level menu)))
     (:mute (setf (menu-muted? menu)
-                 (not (menu-muted? menu))))))
+                 (not (menu-muted? menu)))
+     (if (menu-muted? menu)
+         (sdl2-mixer:halt-channel 0)
+         (sdl2-mixer:play-channel 0 *sound* -1)))))
 
 (defsketch rht-game ((level-number 1)
                      (level (level 1))
@@ -236,9 +242,18 @@
        (defun sketch::make-error-font ()))
 
 (defmethod setup ((app rht-game) &key &allow-other-keys)
-  (setf *font-face* (load-resource (data-path *font-name*))))
+  (setf *font-face* (load-resource (data-path *font-name*)))
+  (sdl2-mixer:init :wave)
+  (sdl2-mixer:open-audio 44100 :s16sys 2 512)
+  (sdl2-mixer:allocate-channels 1)
+  (setf *sound* (sdl2-mixer:load-wav (data-path *sound-filename*)))
+  (sdl2-mixer:play-channel 0 *sound* -1))
 
 (defmethod kit.sdl2:close-window :before ((app rht-game))
+  (sdl2-mixer:halt-channel -1)
+  (sdl2-mixer:close-audio)
+  (sdl2-mixer:free-chunk *sound*)
+  (sdl2-mixer:quit)
   (setf *running* nil))
 
 (defmethod kit.sdl2:keyboard-event ((app rht-game) state ts repeat? keysym
