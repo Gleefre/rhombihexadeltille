@@ -195,11 +195,21 @@
         (with-pen (make-pen :fill (color :foreground-arrived-node))
           (ngon n x y side side angle))))))
 
-(defun draw-level-chooser (menu animate? animate-progress level-number level)
+(defun draw-level-chooser (menu animate? animate-progress)
   (with-rotate ((* 30 (menu-level menu)))
     (loop for dir in +all-directions+
           for (hx hy) = (hex-> dir 0 0)
-          do (draw-level-chooser-node hx hy *side* animate? animate-progress))))
+          do (draw-level-chooser-node hx hy *side* animate? animate-progress)))
+  (with-rotate ((+ (* 30 (1- (menu-level menu)))
+                   (case animate?
+                     (:level+ (* 30 animate-progress))
+                     (:level- (* -30 animate-progress))
+                     (t 0))))
+    (let ((side *side*))
+      (when (member animate? '(:level+ :level-))
+        (setf side (* side (- 1 (* 1/4 (sin (* pi animate-progress)))))))
+      (with-pen (make-pen :stroke (color :rotation-text) :weight 5)
+        (line 0 0 side 0)))))
 
 (defun draw-menu (menu animate? animate-progress level-number level)
   (with-pen (make-pen :stroke (color :foreground-node)
@@ -237,7 +247,7 @@
                     (if (= 1 (level-steps level)) "" "s"))
             400 350)))
   (with-translate (200 400)
-    (draw-level-chooser menu animate? animate-progress level-number level)))
+    (draw-level-chooser menu animate? animate-progress)))
 
 (defun menu-step (menu animate?)
   (case animate?
