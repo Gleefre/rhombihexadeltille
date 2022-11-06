@@ -254,20 +254,23 @@
     (text "<- P" 100 275))
   (with-font (make-font :color (color :level-text) :size *level-text-size* :face *font-face*)
     (text (format nil "Level: ~a" (menu-level menu))
-          400 350)
+          350 350)
     (let ((best-result (level-passed? (menu-level menu) *conf*)))
       (when best-result
         (text (format nil "Best result: ~a" best-result)
-              400 400))))
-  (when (and (= level-number (menu-level menu))
-             (eql (level-state level) :play)
+              350 400))))
+  (when (and (eql (level-state level) :play)
              (> (level-steps level) 0))
-    (with-font (make-font :color (color :level-text) :size (/ *level-text-size* 2)
-                          :face *font-face* :align :left)
-      (text (format nil "[saved progress: ~a step~a]"
-                    (level-steps level)
-                    (if (= 1 (level-steps level)) "" "s"))
-            400 350)))
+    (with-font (make-font :color (color :level-text) :size (/ *level-text-size* 2) :face *font-face*)
+      (text (if (= level-number (menu-level menu))
+                (format nil "saved progress: ~a step~a"
+                        (level-steps level)
+                        (if (= 1 (level-steps level)) "" "s"))
+                (format nil "saved progress [level ~a] [~a step~a]~%     will be discarded!"
+                        level-number
+                        (level-steps level)
+                        (if (= 1 (level-steps level)) "" "s")))
+            350 460)))
   (with-translate (200 400)
     (draw-level-chooser menu animate? animate-progress)))
 
