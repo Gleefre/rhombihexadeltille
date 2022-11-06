@@ -293,10 +293,13 @@
                      (width 800)
                      (height 800)
                      (title "Rhombihexadeltille GAME"))
+  (fit 800 800 width height)
   (unless *centered*
     (center-sketch sketch::instance)
     (setf *centered* t))
-  (background (color :background))
+  (background (color :background-node))
+  (with-pen (make-pen :fill (color :background))
+    (rect 0 0 800 800))
   (case buffer
     (:menu
      (let ((animate-progress (get-animate-progress animate-start animate?)))
@@ -390,10 +393,10 @@
             (setf animate? (cdr (assoc key *key-map*)))
             (setf animate-start (get-internal-real-time)))))))))
 
-(defun start ()
+(defun start (&rest args &key width height (fullscreen nil))
   (setf *running* t)
-  (setf *centered* nil)
-  (make-instance 'rht-game)
+  (setf *centered* fullscreen)
+  (apply #'make-instance 'rht-game args)
   #+deploy
   (loop while *running*
         do (sleep 1)))
