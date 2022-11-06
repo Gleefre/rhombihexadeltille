@@ -31,7 +31,7 @@
 
 (defpackage #:rhombihexadeltille/utils
   (:use #:cl)
-  (:export #:do-later #:do-now)
+  (:export #:do-later #:do-now #:data-path)
   (:nicknames #:rht/utils))
 
 (defpackage #:rhombihexadeltille/sketch/utils

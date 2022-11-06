@@ -118,10 +118,7 @@
        (defun sketch::make-error-font ()))
 
 (defmethod setup ((app draw-level) &key &allow-other-keys)
-  (setf *font-face* (load-resource (format nil "~a"
-                                           #-deploy (asdf:system-relative-pathname "rhombihexadeltille"
-                                                                                   "RobotoMono-ExtraLight.ttf")
-                                           #+deploy (merge-pathnames (uiop:getcwd) "RobotoMono-ExtraLight.ttf")))))
+  (setf *font-face* (load-resource (data-path "RobotoMono-ExtraLight.ttf"))))
 
 (defmethod kit.sdl2:close-window :before ((app draw-level))
   (setf *running* nil))
