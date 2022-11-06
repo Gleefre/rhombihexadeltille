@@ -8,9 +8,10 @@
 ;; To add colors you need to add it to *color-map* variable in rht/draw package (alist)
 
 ;; A goal if (:color color) where color is one of possible colors.
-;; An actor is one of (:bin safe?) or (:rotation key direction)
+;; An actor is one of (:bin safe?) or (:rotation key direction rotated)
 ;; safe? is NIL or T, depending on is it safe for movers to stay there
 ;; direction is one of :clock or :counter-clock
+;; rotated is number of times it was rotated
 ;; Possible keys: (:a :s :w :d)
 ;; To add keys you need to add it to *key-map* variable in rht/draw package (alist)
 
@@ -35,6 +36,7 @@
                          collect (gethash (hex-> dir x y) map)))
         (squares   (loop for dir in +sq-directions+
                          collect (gethash (hex-> dir x y) map))))
+    (incf (fourth (node-outside (gethash (list x y) map))))
     (if (eql direction :clock)
         (progn (rotate-insides squares   6 0 -1)
                (rotate-insides triangles 6 0 -1))
@@ -48,7 +50,8 @@
   (rotation-map (make-hash-table))
   (steps 0)
   (max-steps 0) ; 0 means no restriction
-  (state :play)) ; :won / :lost / :play
+  (state :play) ; :won / :lost / :play
+  (text "")) ; for tutorial levels
 
 ;; Helpers for parsing coordinates passed to defl/ macros
 
@@ -75,13 +78,13 @@
 
 (defmacro with-new-level (&body body)
   `(let ((level (make-level)))
-     (with-slots (hexagon-map rotation-map max-steps) level
+     (with-slots (hexagon-map rotation-map max-steps text) level
        ,@body)
      level))
 
 (defmacro with-level (level-form &body body)
   `(let ((level ,level-form))
-     (with-slots (hexagon-map rotation-map max-steps) level
+     (with-slots (hexagon-map rotation-map max-steps text) level
        ,@body)
      level))
 
@@ -114,12 +117,15 @@
          (direction ,direction))
      (loop for c in ,(parse-coords coords)
            do (setf (node-outside (gethash c hexagon-map))
-                    (list :rotation key direction))
+                    (list :rotation key direction 0))
            do (push (list c direction)
                     (gethash key rotation-map nil)))))
 
 (defmacro defl/maxsteps (n)
   `(setf max-steps ,n))
+
+(defmacro defl/text (text)
+  `(setf text ,text))
 
 ;; Perform a rotation by its name
 
@@ -147,6 +153,9 @@
   (case (node-inside node)
     ((:red :green :yellow :blue) (not (eql (node-inside node) (cadr (node-outside node)))))
     (:trash t)))
+
+(defun arrived? (node)
+  (not (not-arrived? node)))
 
 (defun all-arrived? (hexagon-map)
   (loop for node being the hash-values of hexagon-map

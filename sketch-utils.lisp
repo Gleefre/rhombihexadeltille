@@ -1,5 +1,23 @@
 (in-package #:rht/sketch/utils)
 
+;; To center window on startup
+
+(defun center-sketch (sketch)
+  (let ((window (kit.sdl2:sdl-window sketch)))
+    (multiple-value-bind (width height) (sdl2:get-window-size window)
+      (let* ((disp-bounds (sdl2:get-display-bounds (sdl2:get-window-display-index window)))
+             (disp-width  (sdl2:rect-width disp-bounds))
+             (disp-height (sdl2:rect-height disp-bounds))
+             (pos-x (/ (- disp-width width) 2))
+             (pos-y (/ (- disp-height height) 2)))
+        (sdl2:set-window-position window pos-x pos-y)))))
+
+;; To make color transparent
+
+(defun apply-alpha (color alpha)
+  (rgb (color-red color) (color-green color) (color-blue color)
+       alpha))
+
 ;; Basic with- macros for translate, rotate and scale sketch functions
 
 (defmacro with-translate ((dx dy) &body body)

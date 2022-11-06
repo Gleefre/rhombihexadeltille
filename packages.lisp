@@ -14,12 +14,12 @@
 
            #:level #:make-level
            #:level-hexagon-map #:level-rotation-map
-           #:level-steps #:level-max-steps #:level-state
+           #:level-steps #:level-max-steps #:level-state #:level-text
 
            #:with-level #:with-new-level
            #:defl/hex #:defl/trip #:defl/trash
-           #:defl/bin #:defl/rotate
-           #:defl/maxsteps
+           #:defl/bin #:defl/rotate #:defl/text
+           #:defl/maxsteps #:arrived?
 
            #:level-step)
   (:nicknames #:rht/core))
@@ -37,7 +37,8 @@
 (defpackage #:rhombihexadeltille/sketch/utils
   (:use #:cl #:sketch)
   (:export #:fit #:with-fit
-           #:with-translate #:with-rotate #:with-scale)
+           #:with-translate #:with-rotate #:with-scale
+           #:center-sketch #:apply-alpha)
   (:nicknames #:rht/sketch/utils))
 
 (defpackage #:rhombihexadeltille/sketch
