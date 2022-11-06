@@ -205,14 +205,14 @@
     (:mute (setf (menu-muted? menu)
                  (not (menu-muted? menu))))))
 
-(defsketch draw-level ((level-number 1)
-                       (level (level 1))
-                       (animate? nil)
-                       (animate-start 0)
-                       (buffer :menu)
-                       (menu (make-menu))
-                       (width 800)
-                       (height 800))
+(defsketch rht-game ((level-number 1)
+                     (level (level 1))
+                     (animate? nil)
+                     (animate-start 0)
+                     (buffer :menu)
+                     (menu (make-menu))
+                     (width 800)
+                     (height 800))
   (unless *centered*
     (center-sketch sketch::instance)
     (setf *centered* t))
@@ -235,13 +235,13 @@
 (progn (defun sketch::make-default-font ())
        (defun sketch::make-error-font ()))
 
-(defmethod setup ((app draw-level) &key &allow-other-keys)
+(defmethod setup ((app rht-game) &key &allow-other-keys)
   (setf *font-face* (load-resource (data-path *font-name*))))
 
-(defmethod kit.sdl2:close-window :before ((app draw-level))
+(defmethod kit.sdl2:close-window :before ((app rht-game))
   (setf *running* nil))
 
-(defmethod kit.sdl2:keyboard-event ((app draw-level) state ts repeat? keysym
+(defmethod kit.sdl2:keyboard-event ((app rht-game) state ts repeat? keysym
                                     &aux (key (sdl2:scancode keysym)))
   (when (and (eq state :keydown))
     (with-slots (buffer level level-number appdata animate? animate-start menu) app
@@ -278,7 +278,7 @@
 (defun start ()
   (setf *running* t)
   (setf *centered* nil)
-  (make-instance 'draw-level)
+  (make-instance 'rht-game)
   #+deploy
   (loop while *running*
         do (sleep 1)))
