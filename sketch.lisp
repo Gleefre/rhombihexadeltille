@@ -160,7 +160,7 @@
          400 125))
   (with-font (make-font :size (/ *level-text-size* 2) :face *font-face* :color (color :level-text)
                         :align :center)
-    (text (format nil "Press M to go to menu~%[your progress will be saved]") 400 720)))
+    (text (format nil "Press M to go back to the menu~%[your progress will be saved]") 400 720)))
 
 (defun draw-mute-hexagon (muted? animate? animate-progress)
   (with-pen (make-pen :fill (color :background-node))
@@ -180,26 +180,64 @@
   (level 1)
   (muted? nil))
 
-(defun draw-menu (menu animate? animate-progress)
+(defun draw-level-chooser-node (hx hy side animate? animate-progress)
+  (destructuring-bind ((n angle) (x y))
+      (list (node-shape hx hy) (hex-to-xy hx hy))
+    (let ((x (* x side))
+          (y (* y side))
+          (side (* (- side *d-side*) (ngon-scale n))))
+      (with-current-matrix
+        (case animate?
+          (:level+ (rotate (* 30 animate-progress)))
+          (:level- (rotate (* -30 animate-progress))))
+        (case animate?
+          ((:level+ :level-) (setf side (* side (- 1 (* 1/4 (sin (* pi animate-progress))))))))
+        (with-pen (make-pen :fill (color :foreground-arrived-node))
+          (ngon n x y side side angle))))))
+
+(defun draw-level-chooser (menu animate? animate-progress level-number level)
+  (with-rotate ((* 30 (menu-level menu)))
+    (loop for dir in +all-directions+
+          for (hx hy) = (hex-> dir 0 0)
+          do (draw-level-chooser-node hx hy *side* animate? animate-progress))))
+
+(defun draw-menu (menu animate? animate-progress level-number level)
   (with-pen (make-pen :stroke (color :foreground-node)
                       :fill (apply-alpha (color :background-node) 0.1))
     (rect 0 100 800 5)
     (rect 0 700 800 5))
   (with-font (make-font :color (color :level-text) :size *level-text-size*
                         :face *font-face* :align :center :line-height 1.1)
-    (text "Press SPACE to start" 400 25))
+    (text "Press SPACE to start" 400 725)
+    (text "Press Q to exit" 200 140))
   (with-font (make-font :color (color :level-text) :size (/ *level-text-size* 2)
                         :face *font-face* :align :center :line-height 1.1)
-    (text "Press M to (un)mute sound:" 200 740))
-  (with-translate (600 750)
+    (text "Press M to (un)mute sound:" 200 40))
+  (with-translate (600 50)
     (let ((*side* 30))
       (draw-mute-hexagon (menu-muted? menu) animate? animate-progress)
-      (with-font (make-font :color (color :level-text) :size (/ *level-text-size* 2)
+      (with-font (make-font :color (apply-alpha (color :level-text) (if (menu-muted? menu) 0.5 1))
+                            :size (/ *level-text-size* 2)
                             :face *font-face* :align :left)
         (text "PLAYING" (+ 10 *side*) -15))
-      (with-font (make-font :color (color :level-text) :size (/ *level-text-size* 2)
+      (with-font (make-font :color (apply-alpha (color :level-text) (if (menu-muted? menu) 1 0.5))
+                            :size (/ *level-text-size* 2)
                             :face *font-face* :align :right)
-        (text "MUTED" (- -10 *side*) -15)))))
+        (text "MUTED" (- -10 *side*) -15))))
+  (with-font (make-font :color (color :level-text) :size *level-text-size* :face *font-face*)
+    (text (format nil "Level: ~a" (menu-level menu))
+          400 300))
+  (when (and (= level-number (menu-level menu))
+             (eql (level-state level) :play)
+             (> (level-steps level) 0))
+    (with-font (make-font :color (color :level-text) :size (/ *level-text-size* 2)
+                          :face *font-face* :align :left)
+      (text (format nil "[saved progress: ~a step~a]"
+                    (level-steps level)
+                    (if (= 1 (level-steps level)) "" "s"))
+            400 350)))
+  (with-translate (200 400)
+    (draw-level-chooser menu animate? animate-progress level-number level)))
 
 (defun menu-step (menu animate?)
   (case animate?
@@ -211,7 +249,7 @@
          (sdl2-mixer:halt-channel 0)
          (sdl2-mixer:play-channel 0 *sound* -1)))))
 
-(defsketch rht-game ((level-number 1)
+ (defsketch rht-game ((level-number 1)
                      (level (level 1))
                      (animate? nil)
                      (animate-start 0)
@@ -229,7 +267,7 @@
        (when (and animate? (> animate-progress 0.97))
          (menu-step menu animate?)
          (setf animate? nil))
-       (draw-menu menu animate? animate-progress)))
+       (draw-menu menu animate? animate-progress level-number level)))
     (:level
      (let ((animate-progress (get-animate-progress animate-start animate?)))
        (when (and animate? (> animate-progress 0.97))
@@ -237,9 +275,14 @@
          (setf animate? nil))
        (draw-level level-number level animate? animate-progress)))))
 
+;; sketch loads default font on startup, but we don't want to ship them
 #+deploy
 (progn (defun sketch::make-default-font ())
        (defun sketch::make-error-font ()))
+
+;; sketch define `ESC` as "close window" button. We want to override this behaviour
+(defmethod kit.sdl2:keyboard-event :before ((instance sketch) state timestamp repeatp keysym)
+  (declare (ignorable timestamp repeatp)))
 
 (defmethod setup ((app rht-game) &key &allow-other-keys)
   (setf *font-face* (load-resource (data-path *font-name*)))
@@ -263,6 +306,15 @@
       (case buffer
         (:menu (unless animate?
                  (case key
+                   (:scancode-q (kit.sdl2:close-window app))
+                   (:scancode-n
+                    (when (< (menu-level menu) *levels*)
+                      (setf animate? :level+)
+                      (setf animate-start (get-internal-real-time))))
+                   (:scancode-p
+                    (when (> (menu-level menu) 1)
+                      (setf animate? :level-)
+                      (setf animate-start (get-internal-real-time))))
                    (:scancode-m (setf animate? :mute)
                     (setf animate-start (get-internal-real-time)))
                    (:scancode-space
