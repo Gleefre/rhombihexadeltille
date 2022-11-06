@@ -9,6 +9,7 @@
                (:file "core")
                (:file "levels")
                (:file "utils")
+               (:file "conf")
                (:file "sketch-utils")
                (:file "sketch"))
 

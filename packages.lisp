@@ -34,6 +34,12 @@
   (:export #:do-later #:do-now #:data-path)
   (:nicknames #:rht/utils))
 
+(defpackage #:rhombihexadeltille/conf
+  (:use #:cl)
+  (:export #:save-conf #:load-conf
+           #:level-passed? #:muted? #:conf-menu-level)
+  (:nicknames #:rht/conf))
+
 (defpackage #:rhombihexadeltille/sketch/utils
   (:use #:cl #:sketch)
   (:export #:fit #:with-fit
@@ -44,7 +50,8 @@
 (defpackage #:rhombihexadeltille/sketch
   (:use #:cl #:sketch
         #:rht/core #:rht/levels #:rht/geometry
-        #:rht/utils #:rht/sketch/utils)
+        #:rht/utils #:rht/sketch/utils
+        #:rht/conf)
   (:export #:start)
   (:nicknames #:rht/sketch))
 
