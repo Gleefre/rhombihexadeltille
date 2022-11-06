@@ -21,7 +21,7 @@
 (defparameter *level-map*
   '((:scancode-1 . 1) (:scancode-2 . 2) (:scancode-3 . 3) (:scancode-4 . 4)))
 
-(defvar *font-face*)
+(defparameter *font-face* nil)
 (defparameter *running* t)
 
 (defun draw-node (hx hy node animate? animate-progress hex-map)
