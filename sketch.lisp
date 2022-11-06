@@ -173,6 +173,10 @@
     (with-pen (make-pen :stroke (color :rotation-text) :weight 5)
       (line 0 0 *side* 0))))
 
+(defstruct menu
+  (level 1)
+  (muted? nil))
+
 (defun draw-menu (menu animate? animate-progress)
   (with-pen (make-pen :stroke (color :foreground-node)
                       :fill (apply-alpha (color :background-node) 0.1))
@@ -193,10 +197,6 @@
       (with-font (make-font :color (color :level-text) :size (/ *level-text-size* 2)
                             :face *font-face* :align :right)
         (text "MUTED" (- -10 *side*) -15)))))
-
-(defstruct menu
-  (level 1)
-  (muted? nil))
 
 (defun menu-step (menu animate?)
   (case animate?
