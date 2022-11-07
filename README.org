@@ -6,21 +6,49 @@
 #+language: en
 
 * Description
+  Rhombihexadeltille GAME is a little puzzle game.
+  It is based on rhombitrihexagonal tiling. To win you need to send dots to their destinations!
+
+  This game is published under Apache 2.0 Licence.
+
+  This game is "working on my computer", if you are unable to run it or if you encounter various bugs, please create an issue on github repository.
+** Screenshots
+   [[screenshots/main-menu.png]]
+   [[screenshots/level-1.png]]
+   [[screenshots/level-4.png]]
 * Installation
 ** Requirements
-* todo list
-  - Game
-    - [-] Game engine (sketch for drawing?)
-    - [ ] Level design
-    - [ ] Main menu
-    - [ ] Options
-    - [ ] Sound (sdl2-mixer?)
-    - [ ] Deployment
-  - Github repo
-    - [ ] Readme rewrite
-    - [ ] Separate TODO
-    - [X] Licence
-  - [ ] Publish on icht.io and submit it for Lisp Game Jam 2022
+   - Libraries
+     To run this game from source you need to have [[https://github.com/vydd/sketch][sketch]] and [[https://github.com/lispgames/cl-sdl2-mixer][cl-sdl2-mixer]] installed.
+     To ensure that game will be working, please install sketch from github repository.
+     (You'll need to clone it to local-projects folder of your quicklisp installation.
+     You'll need to clone [[https://github.com/lispgames/cl-sdl2][cl-sdl2]] and [[https://github.com/lispgames/sdl2kit][sdl2.kit]] as well.)
+   - Foreign dependencies
+     - SDL2
+       =sketch= relies on =SDL2= library which is a C library.
+       You can find it's release at [[https://www.libsdl.org][libsdl webpage]].
+       This game also relies on =SDL2 Image= & =SDL2 TTF= & =SDL2 Mixer=,
+       all of those are part of SDL2 project.
+     - libffi & OpenGL
+       See [[https://github.com/vydd/sketch#foreign-dependencies][sketch's README]]
+** Running
+   To run this game you need to =quickload= its system:
+   #+BEGIN_SRC lisp
+   (ql:quickload :rhombihexadeltille)
+   #+END_SRC
+   Then you need to call the main function:
+   #+BEGIN_SRC lisp
+   (rht:start)
+   #+END_SRC
+   Note that you should NOT run 2 instances of the game, this will probably break it.
+   
+   =#'rht:start= accepts keyword parameters: =:width= of the screen, =:height= of the screen and =:fullscreen= if you want to run game in fullscreen mode.
+   Note that fullscreen mode does NOT work nicely.
+** Building from source
+   To build an executable you need to run =make= (or =make build=) in source folder.
+   That will create a folder =rhombihexadeltille-game= with an executable =rhombihexadeltille-game= inside it.
+   It also will create a =.zip= file.
+   To remove all files produced by =make= run =make clean=.
 * License
    Copyright 2022 Gleefre
 

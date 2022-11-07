@@ -1,0 +1,13 @@
+* todo list
+  - Game
+    - [X] Game engine (sketch for drawing?)
+    - [X] Level design
+    - [X] Main menu
+    - [ ] Options
+    - [X] Sound (sdl2-mixer?)
+    - [X] Deployment
+  - Github repo
+    - [ ] Readme rewrite
+    - [X] Separate TODO
+    - [X] Licence
+  - [X] Publish on icht.io and submit it for Lisp Game Jam 2022

@@ -1,10 +1,10 @@
 LISP ?= sbcl
 
 build:
-	$(LISP) --load rhombihexadeltille.asd \
-		--eval "(ql:quickload :deploy)" \
+	$(LISP) --eval "(ql:quickload :deploy)" \
 		--eval "(ql:quickload :sketch)" \
 		--eval "(push :deploy *features*)" \
+		--load rhombihexadeltille.asd \
 		--eval "(asdf:load-system :rhombihexadeltille :force t)" \
 		--eval "(asdf:make :rhombihexadeltille)" \
 		--eval "(quit)"
@@ -14,4 +14,7 @@ build:
 	rm -rf rhombihexadeltille-game/
 	mv bin/ rhombihexadeltille-game/
 	zip rhombihexadeltille-game.zip rhombihexadeltille-game/*
+
+clean:
 	rm -rf rhombihexadeltille-game/
+	rm -rf rhombihexadeltille-game.zip
