@@ -32,10 +32,9 @@
   (cdr (assoc color-name *color-map*)))
 
 (defparameter *key-map*
-  '((:scancode-a . :a) (:scancode-s . :s)
-    (:scancode-d . :d) (:scancode-w . :w)))
-(defparameter *level-map*
-  '((:scancode-1 . 1) (:scancode-2 . 2) (:scancode-3 . 3) (:scancode-4 . 4)))
+  '((:scancode-1 . :1) (:scancode-2 . :2) (:scancode-3 . :3) (:scancode-4 . :4)
+    (:scancode-5 . :5) (:scancode-6 . :6) (:scancode-7 . :7) (:scancode-8 . :8)
+    (:scancode-9 . :0) (:scancode-0 . :0)))
 
 (defparameter *font-face* nil)
 (defparameter *running* t)
@@ -87,7 +86,7 @@
                     r-cy (* cy *side*))
               (decf r-side (* *d-side* 2 (sin (* pi animate-progress)))))))
         (do-later 2
-          (with-pen (make-pen :fill (color (if (and (or (not origin) (= n 6))
+          (with-pen (make-pen :fill (color (if (and (node-inside node)
                                                     (arrived? node))
                                                :foreground-arrived-node
                                                :foreground-node)))
@@ -101,7 +100,7 @@
         (case (car (node-outside node))
           (:color
            (do-later 3
-             (with-pen (make-pen :stroke (color (second (node-outside node)))
+             (with-pen (make-pen :stroke (apply-alpha (color (second (node-outside node))) 0.75)
                                  :weight *outside-weight*)
                (ngon n x y sub-side sub-side angle))))
           (:bin
@@ -156,15 +155,24 @@
           200 25))
   (with-font (make-font :color (color :level-text) :size *tutorial-text-size*
                         :face *font-face* :align :center :line-height 1.1)
-   (text (case (level-state level)
-           (:won "[press N for next level]")
-           (:lost "[press R to restart]")
-           (:play (format nil (level-text level))))
-         400 125))
+    (text (case (level-state level)
+            (:won "[press N for next level]")
+            (:lost "[press R to restart]")
+            (:play (format nil (level-text level))))
+          400 125))
   (with-font (make-font :size (/ *level-text-size* 2) :face *font-face* :color (color :level-text)
                         :align :center)
-    (text (format nil "Press M to go back to the menu~%[your progress will be saved]") 400 720)
-    (text "N ->" 750 740)
+    (text (format nil "Press M to go back to the menu~%[your progress will be saved]") 400 720))
+  (with-font (make-font :color (apply-alpha (color :level-text) (if (or (< level-number *levels*)
+                                                                        (and (= level-number 12)
+                                                                             (access-13?)))
+                                                                    1 0.5))
+                        :size (/ *level-text-size* 2)
+                        :face *font-face* :align :center)
+    (text "N ->" 750 740))
+  (with-font (make-font :color (apply-alpha (color :level-text) (if (< 1 level-number) 1 0.5))
+                        :size (/ *level-text-size* 2)
+                        :face *font-face* :align :center)
     (text "<- P" 50 740)))
 
 (defun draw-mute-hexagon (muted? animate? animate-progress)
@@ -244,7 +252,10 @@
                             :size (/ *level-text-size* 2)
                             :face *font-face* :align :right)
         (text "MUTED" (- -10 *side*) -15))))
-  (with-font (make-font :color (apply-alpha (color :level-text) (if (< (menu-level menu) *levels*) 1 0.5))
+  (with-font (make-font :color (apply-alpha (color :level-text) (if (or (< (menu-level menu) *levels*)
+                                                                        (and (= (menu-level menu) 12)
+                                                                             (access-13?)))
+                                                                    1 0.5))
                         :size (/ *level-text-size* 2)
                         :face *font-face* :align :right)
     (text "N ->" 300 275))
@@ -274,6 +285,10 @@
   (with-translate (200 400)
     (draw-level-chooser menu animate? animate-progress)))
 
+(defun access-13? ()
+  (loop for i from 1 to 12
+        always (level-passed? i *conf*)))
+
 (defun menu-step (menu animate?)
   (case animate?
     (:level+ (incf (menu-level menu)))
@@ -290,9 +305,8 @@
                      (animate-start 0)
                      (buffer :menu)
                      (menu (make-menu))
-                     (width 800)
-                     (height 800)
                      (title "Rhombihexadeltille GAME"))
+  (if (and (= level-number 1) (= 0 (level-steps level))) (setf level (level 1)))
   (fit 800 800 width height)
   (unless *centered*
     (center-sketch sketch::instance)
@@ -358,7 +372,9 @@
                  (case key
                    (:scancode-q (kit.sdl2:close-window app))
                    (:scancode-n
-                    (when (< (menu-level menu) *levels*)
+                    (when (or (< (menu-level menu) *levels*)
+                              (and (= (menu-level menu) 12)
+                                   (access-13?)))
                       (setf animate? :level+)
                       (setf animate-start (get-internal-real-time))))
                    (:scancode-p
@@ -380,23 +396,23 @@
             (setf (menu-level menu) level-number)
             (setf buffer :menu))
            ((eql key :scancode-r) (setf level (level level-number)))
-           ((eql key :scancode-n) (when (< level-number *levels*)
+           ((eql key :scancode-n) (when (or (< level-number *levels*)
+                                            (and (= level-number 12)
+                                                 (access-13?)))
                                     (incf level-number)
                                     (setf level (level level-number))))
            ((eql key :scancode-p) (when (> level-number 1)
                                     (decf level-number)
                                     (setf level (level level-number))))
-           ((assoc key *level-map*) (setf level-number (cdr (assoc key *level-map*))
-                                          level (level level-number)))
            ((not (eql :play (level-state level))))
            ((assoc key *key-map*)
             (setf animate? (cdr (assoc key *key-map*)))
             (setf animate-start (get-internal-real-time)))))))))
 
-(defun start (&rest args &key width height (fullscreen nil))
+(defun start (&key (width 800) (height 800) (fullscreen nil))
   (setf *running* t)
   (setf *centered* fullscreen)
-  (apply #'make-instance 'rht-game args)
+  (make-instance 'rht-game :width width :height height :fullscreen fullscreen)
   #+deploy
   (loop while *running*
         do (sleep 1)))

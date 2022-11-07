@@ -1,6 +1,6 @@
 (asdf:defsystem "rhombihexadeltille"
   :description "A little puzzle game"
-  :version "0.0.4"
+  :version "0.0.6"
   :author "Gleefre <varedif.a.s@gmail.com>"
   :licence "Apache 2.0"
   :depends-on ("sketch" "sdl2-mixer")
