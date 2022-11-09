@@ -19,12 +19,12 @@ jobs:
     - name: install quicklisp
       run: |
         curl -O https://beta.quicklisp.org/quicklisp.lisp
-        C:/ProgramData/chocolatey/bin/sbcl.exe --load quicklisp.lisp --eval "(quicklisp-quickstart:install :path \".quicklisp\")" --eval "(ql-util:without-prompting (ql:add-to-init-file))" --quit
+        C:/ProgramData/chocolatey/bin/sbcl.exe --load quicklisp.lisp --eval "(quicklisp-quickstart:install)" --eval "(ql-util:without-prompting (ql:add-to-init-file))" --eval "(print ql:*quicklisp-home*)" --eval "(print (user-homedir-pathname))" --quit
       shell: msys2 {0}
 
     - name: install sketch & cl-sdl2 & sdl2.kit from source
       run: |
-        cd .quicklisp/local-projects/
+        cd quicklisp/local-projects/
         git clone https://github.com/vydd/sketch
         git clone https://github.com/lispgames/cl-sdl2
         git clone https://github.com/lispgames/sdl2kit
