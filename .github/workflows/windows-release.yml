@@ -1,0 +1,83 @@
+name: Makefile CI
+on: [workflow_dispatch]
+jobs:
+  build:
+    runs-on: windows-2019
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        ref: release-windows
+
+    - name: install msys2
+      uses: msys2/setup-msys2@v2
+      with:
+        install: mingw-w64-x86_64-libffi make mingw-w64-x86_64-pkg-config mingw-w64-x86_64-gcc
+  
+    - name: install sbcl
+      run: choco install sbcl
+
+    - name: install quicklisp
+      run: |
+        curl -O https://beta.quicklisp.org/quicklisp.lisp
+        C:/ProgramData/chocolatey/bin/sbcl.exe --non-interactive --load quicklisp.lisp --eval "(quicklisp-quickstart:install)" --eval "(ql-util:without-prompting (ql:add-to-init-file))"
+      shell: msys2 {0}
+
+    - name: download SDL2
+      uses: albin-johansson/download-sdl2@v2
+      with:
+        version: 2.24.2
+        sources_destination: .
+        binaries_destination: .
+    - name: download SDL2-IMAGE
+      uses: albin-johansson/download-sdl2-image@v2
+      with:
+        version: 2.6.2
+        sources_destination: .
+        binaries_destination: .
+    - name: download SDL-TTF
+      uses: albin-johansson/download-sdl2-ttf@v1
+      with:
+        version: 2.20.1
+        sources_destination: .
+        binaries_destination: .
+    - name: download SDL2-MIXER
+      uses: albin-johansson/download-sdl2-mixer@v1
+      with:
+        version: 2.6.2
+        sources_destination: .
+        binaries_destination: .
+
+    - name: install sketch & cl-sdl2 & sdl2.kit from source
+      run: |
+        cd ~/quicklisp/local-projects/
+        git clone https://github.com/vydd/sketch
+        git clone https://github.com/lispgames/cl-sdl2
+        git clone https://github.com/lispgames/sdl2kit
+      shell: bash
+
+    - name: prep
+      run: |
+        rm -rf bin/
+        mkdir bin/
+        cp *.dll bin/
+      shell: msys2 {0}
+
+    - name: build
+      run: LISP=C:/ProgramData/chocolatey/bin/sbcl.exe make
+      shell: msys2 {0}
+
+    - name: remove old zip
+      run: rm -f windows-release.zip
+      shell: bash
+
+    - name: create new zip (windows)
+      run: Compress-Archive -Path .\rhombihexadeltille-game -DestinationPath .\windows-release
+
+    - name: Git Commit and Push
+      run: |
+          git status
+          git add windows-release.zip
+          git config --global user.name 'Gleefre'
+          git config --global user.email 'Gleefre@users.noreply.github.com'
+          git commit -am "windows release built"
+          git push
