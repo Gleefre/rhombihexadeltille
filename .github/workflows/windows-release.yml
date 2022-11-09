@@ -24,7 +24,7 @@ jobs:
 
     - name: install sketch & cl-sdl2 & sdl2.kit from source
       run: |
-        cd quicklisp/local-projects/
+        cd D:/a/_temp/msys64/home/runneradmin/quicklisp/local-projects/ # FIXME
         git clone https://github.com/vydd/sketch
         git clone https://github.com/lispgames/cl-sdl2
         git clone https://github.com/lispgames/sdl2kit
