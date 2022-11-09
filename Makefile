@@ -13,7 +13,6 @@ build:
 	cp soundtrack.wav bin/
 	rm -rf rhombihexadeltille-game/
 	mv bin/ rhombihexadeltille-game/
-	zip rhombihexadeltille-game.zip rhombihexadeltille-game/*
 
 clean:
 	rm -rf rhombihexadeltille-game/
