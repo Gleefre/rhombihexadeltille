@@ -22,6 +22,14 @@ jobs:
         C:/ProgramData/chocolatey/bin/sbcl.exe --non-interactive --load quicklisp.lisp --eval "(quicklisp-quickstart:install)" --eval "(ql-util:without-prompting (ql:add-to-init-file))"
       shell: msys2 {0}
 
+    - name: install sketch & cl-sdl2 & sdl2.kit from source
+      run: |
+        cd ~/.quicklisp/local-projects/
+        git clone https://github.com/vydd/sketch
+        git clone https://github.com/lispgames/cl-sdl2
+        git clone https://github.com/lispgames/sdl2kit
+      shell: msys2 {0}
+
     - name: download SDL2
       uses: albin-johansson/download-sdl2@v2
       with:
@@ -46,14 +54,6 @@ jobs:
         version: 2.6.2
         sources_destination: .
         binaries_destination: .
-
-    - name: install sketch & cl-sdl2 & sdl2.kit from source
-      run: |
-        cd ~/.quicklisp/local-projects/
-        git clone https://github.com/vydd/sketch
-        git clone https://github.com/lispgames/cl-sdl2
-        git clone https://github.com/lispgames/sdl2kit
-      shell: bash
 
     - name: prep
       run: |
