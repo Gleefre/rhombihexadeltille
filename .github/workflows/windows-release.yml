@@ -2,7 +2,7 @@ name: Makefile CI
 on: [workflow_dispatch]
 jobs:
   build:
-    runs-on: windows-2019
+    runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
       with:
@@ -34,7 +34,7 @@ jobs:
     - name: download SDL2
       uses: albin-johansson/download-sdl2@v2
       with:
-        version: 2.0.22
+        version: 2.6.2
         sources_destination: .
         binaries_destination: .
     - name: download SDL2-IMAGE
