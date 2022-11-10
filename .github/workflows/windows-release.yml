@@ -52,7 +52,7 @@ jobs:
     - name: download SDL2-MIXER
       uses: albin-johansson/download-sdl2-mixer@v1
       with:
-        version: 2.6.2
+        version: 2.0.4
         sources_destination: .
         binaries_destination: .
 
