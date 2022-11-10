@@ -28,6 +28,7 @@ jobs:
         git clone https://github.com/vydd/sketch
         git clone https://github.com/lispgames/cl-sdl2
         git clone https://github.com/lispgames/sdl2kit
+        git clone https://github.com/lispgames/cl-sdl2-mixer
       shell: bash
 
     - name: download SDL2
