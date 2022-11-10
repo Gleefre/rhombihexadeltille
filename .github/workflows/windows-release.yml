@@ -76,8 +76,7 @@ jobs:
 
     - name: Git Commit and Push
       run: |
-          git status
-          git add windows-release.zip
+          git add --force windows-release.zip
           git config --global user.name 'Gleefre'
           git config --global user.email 'Gleefre@users.noreply.github.com'
           git commit -am "windows release built"
