@@ -34,7 +34,7 @@ jobs:
     - name: download SDL2
       uses: albin-johansson/download-sdl2@v2
       with:
-        version: 2.24.2
+        version: 2.0.22
         sources_destination: .
         binaries_destination: .
     - name: download SDL2-IMAGE
