@@ -409,10 +409,4 @@
             (setf animate? (cdr (assoc key *key-map*)))
             (setf animate-start (get-internal-real-time)))))))))
 
-(defun start (&key (width 800) (height 800) (fullscreen nil))
-  (setf *running* t)
-  (setf *centered* fullscreen)
-  (make-instance 'rht-game :width width :height height :fullscreen fullscreen)
-  #+deploy
-  (loop while *running*
-        do (sleep 1)))
+(define-start-function start rht-game (:width 800 :height 800 :resizable t))
