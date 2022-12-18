@@ -1,12 +1,10 @@
 name: Makefile CI
 on: [workflow_dispatch]
 jobs:
-  build:
+  windows:
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v2
-      with:
-        ref: release-windows
+    - uses: actions/checkout@v3
 
     - name: install msys2
       uses: msys2/setup-msys2@v2
@@ -15,7 +13,6 @@ jobs:
   
     - name: install sbcl
       run: choco install sbcl
-
     - name: install quicklisp
       run: |
         curl -O https://beta.quicklisp.org/quicklisp.lisp
@@ -34,6 +31,7 @@ jobs:
     - name: download SDL2
       uses: albin-johansson/download-sdl2@v2
       with:
+        # FIXME downgraded because of sdl wav bug
         version: 2.0.22
         sources_destination: .
         binaries_destination: .
@@ -74,10 +72,8 @@ jobs:
     - name: create new zip (windows)
       run: Compress-Archive -Path .\rhombihexadeltille-game -DestinationPath .\windows-release
 
-    - name: Git Commit and Push
-      run: |
-          git add --force windows-release.zip
-          git config --global user.name 'Gleefre'
-          git config --global user.email 'Gleefre@users.noreply.github.com'
-          git commit -am "windows release built"
-          git push
+    - name: upload release
+      uses: actions/upload-artifact@v3
+      with:
+        name: windows-release-artifact.zip
+        path: windows-release.zip
