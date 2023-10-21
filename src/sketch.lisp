@@ -309,7 +309,7 @@
   (if (and (= level-number 1) (= 0 (level-steps level))) (setf level (level 1)))
   (fit 800 800 width height)
   (unless *centered*
-    (center-sketch sketch::instance)
+    (center-sketch sketch::*sketch*)
     (setf *centered* t))
   (background (color :background-node))
   (with-pen (make-pen :fill (color :background))
@@ -409,4 +409,4 @@
             (setf animate? (cdr (assoc key *key-map*)))
             (setf animate-start (get-internal-real-time)))))))))
 
-(define-start-function start rht-game (:width 800 :height 800 :resizable t))
+(define-start-function (start) rht-game (:width 800 :height 800 :resizable t))
