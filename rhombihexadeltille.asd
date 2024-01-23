@@ -3,7 +3,7 @@
   :version "0.0.8"
   :author "Gleefre <varedif.a.s@gmail.com>"
   :licence "Apache 2.0"
-  :depends-on ("sketch" "sdl2-mixer")
+  :depends-on ("sketch" "sketch-utils" "sdl2-mixer")
   :pathname "src"
   :components ((:file "packages")
                (:file "geometry")

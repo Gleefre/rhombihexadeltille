@@ -409,4 +409,4 @@
             (setf animate? (cdr (assoc key *key-map*)))
             (setf animate-start (get-internal-real-time)))))))))
 
-(define-start-function (start) rht-game (:width 800 :height 800 :resizable t))
+(sketch-utils:define-start-function (start) rht-game (:width 800 :height 800 :resizable t))
